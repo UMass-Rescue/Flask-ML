@@ -13,7 +13,16 @@ def alexnet_object_rec(img):
     out = alexnet(image)
     return out
 
-@serv.route('/test')
+
+@serv.route('/object_detection_resnet',input = {"transform": "tensor"}, output={"classification":"imagenet"})
+def resnet_object_rec(img):
+    resnet = models.resnet101(pretrained=True)
+    image = torch.unsqueeze(img, 0)
+    resnet.eval()
+    out = resnet(image)
+    return out
+
+@serv.route('/img_shape')
 def tester(img):
     x = img.shape[1]
     y = img.shape[0]

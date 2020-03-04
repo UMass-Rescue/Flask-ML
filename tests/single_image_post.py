@@ -17,8 +17,11 @@ def post_image(img_file, endpoint):
 r = requests.get(os.path.join(HOST, 'get_models'))
 print(r.text)
 
-r = post_image("tests/dog.jpeg","test")
+r = post_image("tests/dog.jpg","img_shape")
 print(r.text)
 
-r = post_image("tests/dog.jpeg","object_detection_alexnet")
+r = post_image("tests/dog.jpg","object_detection_alexnet")
+print(r.text)
+
+r = post_image("tests/dog.jpg","object_detection_resnet")
 print(r.text)
