@@ -1,27 +1,16 @@
-import requests
-import base64
-import os
+from flask_ml import MLClient
 
 HOST = 'http://127.0.0.1:5000'
+clie = MLClient(HOST)
 
+models = clie.get_models()
+print(models)
 
-def post_image(img_file, endpoint):
-    """ post image and return the response """
-    img = open(img_file, 'rb').read()
-    img = base64.b64encode(img).decode('utf-8')
+result = clie.predict("tests/dog.jpg","img_shape", "single image")
+print(result)
 
-    data={"type":"single_image","name":img_file, "image":img}
-    response = requests.post(os.path.join(HOST, endpoint), json=data)
-    return response
+r = clie.predict("tests/dog.jpg","object_detection_alexnet", "single image")
+print(result)
 
-r = requests.get(os.path.join(HOST, 'get_models'))
-print(r.text)
-
-r = post_image("tests/dog.jpg","img_shape")
-print(r.text)
-
-r = post_image("tests/dog.jpg","object_detection_alexnet")
-print(r.text)
-
-r = post_image("tests/dog.jpg","object_detection_resnet")
-print(r.text)
+r = clie.predict("tests/dog.jpg","object_detection_resnet", "single image")
+print(result)
