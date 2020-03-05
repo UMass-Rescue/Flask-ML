@@ -6,16 +6,18 @@ A Flask extension for running machine learning code
 """
 from setuptools import setup
 
+with open("README.md", "r") as fh:
+    long_description = fh.read()
 
 setup(
     name='Flask-ML',
-    version='1.0',
+    version='0.0.1',
     url='https://github.com/UMass-Rescue',
     license='MIT',
     author='Jagath Jai Kumar',
     author_email='jagath.jaikumar@gmail.com',
     description='A Flask extension for running machine learning code',
-    long_description=__doc__,
+    long_description=long_description,
     py_modules=['flask_ml'],
     zip_safe=False,
     include_package_data=True,
