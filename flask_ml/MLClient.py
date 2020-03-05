@@ -11,7 +11,6 @@ class MLClient(object):
             self.HOST = 'http://127.0.0.1:5000'
 
     def predict(self, input, endpoint, dtype):
-        """ post image and return the response """
         if dtype == "single image":
             img = open(input, 'rb').read()
             img = base64.b64encode(img).decode('utf-8')

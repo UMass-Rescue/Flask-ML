@@ -25,16 +25,18 @@ class MLServer(object):
 
     def route(self, rule, input = {}, output = {"classification":"miscellaneous"}):
         def build_route(ML_Function):
-            @self.app.route(rule,endpoint=ML_Function.__name__,methods=['POST'])
+            @self.app.route(rule, endpoint=ML_Function.__name__, methods=['POST'])
             def prep_ML():
+
                 data = request.get_json()
                 ml_input = prepare_data(input, data)
+
                 result = ML_Function(ml_input)
+
                 output["model"] = str(rule)[1:]
-                if not output["classification"] == "miscellaneous":
-                    result = wrap_result(output, result)
                 response = return_response(output, result)
                 response = Response(response=response, status=200, mimetype="application/json")
+                
                 return response
             return prep_ML
         return build_route
