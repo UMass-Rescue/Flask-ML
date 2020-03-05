@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-    tests.test_classification
+    tests.test_torch_classification
     ~~~~~~~~~
-    This module uses MLClient to make server calls to the basic_server.
+    This module uses MLClient to make server calls to the torch_server.
     :copyright: 2020 Jagath Jai Kumar
     :license: MIT
 """
@@ -15,9 +15,6 @@ clie = MLClient()
 # print available models json object
 models = clie.get_models()
 print(models)
-
-result = clie.predict("tests/utils/dog.jpg","img_shape", "single image")
-print(result)
 
 result = clie.predict("tests/utils/dog.jpg","object_detection_alexnet", "single image")
 print(result)
