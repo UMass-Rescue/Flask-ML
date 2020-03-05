@@ -8,7 +8,8 @@
 """
 
 from flask import Flask, current_app, request, Response
-from .io_tools import *
+from encoder_decoder.dtypes import InputTypes, OutputTypes
+from encoder_decoder.default_config import encoders, decoders, extract_input, wrap_output
 
 class MLServer(object):
     """The MLServer object is a wrapper class for the flask app object. It
@@ -27,15 +28,6 @@ class MLServer(object):
         """
         self.app = Flask(name)
 
-        @self.app.route("/",methods=['GET'])
-        def landing():
-            """Holds the '/' rule to prevent empty machine learning rules
-            """
-            return "ML-Server Landing Page"
-
-
-
-
         @self.app.route("/get_available_models",methods=['GET'])
         def get_models():
             """Returns a list of models as a JSON object
@@ -43,7 +35,7 @@ class MLServer(object):
             """
 
             # routes that are held for the server
-            prebuilt_routes=["/get_available_models","/static/<path:filename>","/"]
+            prebuilt_routes=["/get_available_models","/static/<path:filename>"]
             routes = []
             for rule in self.app.url_map.iter_rules():
                 if not str(rule) in prebuilt_routes:
@@ -54,39 +46,16 @@ class MLServer(object):
             return Response(response=response)
 
 
-
-    def route(self, rule,input = {},output = {"classification":"miscellaneous"}):
-        """A decorator that is used to register a machine learning function for
-        a given URL rule. Uses the default Flask app route to establish the rule
-        on the server
-
-        :param rule: the URL rule as string
-        :param input: input data for optimizing ML algorithm
-        :param output: output format for either direct return or algorithm
-        chaining
-        """
-        def build_route(ML_Function):
-
-            # default app route decorator
-            @self.app.route(rule,endpoint=ML_Function.__name__,methods=['POST'])
+    def route(self, rule, input_type:InputTypes, output_type:OutputTypes=OutputTypes.STRING):
+        def build_route(ml_function):
+            @self.app.route(rule,endpoint=ml_function.__name__,methods=['POST'])
             def prep_ML():
-
-                # get request json data
-                data = request.get_json()
-
-                # converts image bytes to ndarray
-                ml_input = decode_data(input, data)
-
-                # run prediction function
-                result = ML_Function(ml_input)
-
-                # names the model in output direct
-                output["model"] = str(rule)[1:]
-
-                # return model output as a pickled json object
-                response = return_response(output, result)
-                response = Response(response=response, status=200)
-
+                input_data = decoders[input_type](extract_input[input_type](request))
+                result = ml_function(input_data)
+                output = {}
+                wrap_output[output_type](encoders[output_type](result), output) # TODO Any problem with inplace append to dict?
+                response = create_response(output)
+                response = Response(response=response, status=200, mimetype="application/json")
                 return response
             return prep_ML
         return build_route

@@ -7,10 +7,16 @@
     :license: MIT
 """
 
+
+# CHANGE
+# ==============================================================================
 import requests
 import base64
 import os
 import json
+# ==============================================================================
+
+
 
 class MLClient(object):
     """The MLClient object is a wrapper for making requests to an instance
@@ -39,7 +45,8 @@ class MLClient(object):
         :param dtype: type of data to be classified.
         ["single image", "single_text"]
         """
-
+# CHANGE
+# ==============================================================================
         if dtype == "single image":
             # open image and base64 encode
             img = open(input, 'rb').read()
@@ -51,10 +58,12 @@ class MLClient(object):
         elif dtype == "single text":
             # NOT currently supported
             data={"type":"single_text","text":input}
-
+# ==============================================================================
         # Make post request with given endpoint and json data
         response = requests.post(os.path.join(self.HOST, endpoint), json=data)
         return json.loads(response.text)
+
+
 
     def get_models(self):
         """Return available models as a dictionary of rule names
