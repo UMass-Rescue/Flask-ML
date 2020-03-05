@@ -17,9 +17,6 @@ setup(
     description='A Flask extension for running machine learning code',
     long_description=__doc__,
     py_modules=['flask_ml'],
-    # if you would be using a package instead use packages instead
-    # of py_modules:
-    # packages=['flask_sqlite3'],
     zip_safe=False,
     include_package_data=True,
     platforms='any',

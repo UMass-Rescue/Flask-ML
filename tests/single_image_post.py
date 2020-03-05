@@ -9,8 +9,8 @@ print(models)
 result = clie.predict("tests/dog.jpg","img_shape", "single image")
 print(result)
 
-r = clie.predict("tests/dog.jpg","object_detection_alexnet", "single image")
+result = clie.predict("tests/dog.jpg","object_detection_alexnet", "single image")
 print(result)
 
-r = clie.predict("tests/dog.jpg","object_detection_resnet", "single image")
+result = clie.predict("tests/dog.jpg","object_detection_resnet", "single image")
 print(result)
