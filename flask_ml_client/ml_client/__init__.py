@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    flask_ml_server
+    flask_ml_client
     ~~~~~
     A microframework for machine learning based on Flask.
     Designed at UMass
@@ -8,6 +8,6 @@
     :license: MIT
 """
 
-from .MLServer import MLServer
+from .MLClient import MLClient
 
 __version__ = "0.0.1"

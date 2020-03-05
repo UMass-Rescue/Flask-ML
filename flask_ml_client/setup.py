@@ -1,8 +1,8 @@
 """
-Flask-ML-Server
+Flask-ML-client
 -------------
 
-A Flask extension for running machine learning code on a server
+A Flask extension for running machine learning code interfacing with flask server
 """
 from setuptools import setup
 
@@ -10,7 +10,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
-    name='flask-ml-server',
+    name='flask-ml-client',
     version='0.0.1',
     url='https://github.com/UMass-Rescue',
     license='MIT',
@@ -18,12 +18,17 @@ setup(
     author_email='jagath.jaikumar@gmail.com',
     description="A Flask extension for running machine learning code",
     long_description="A Flask extension for running machine learning code",
-    py_modules=['flask_ml_server'],
+    py_modules=['flask_ml_client'],
     zip_safe=False,
     include_package_data=True,
     platforms='any',
     install_requires=[
-        'Flask'
+        'numpy',
+        'pillow',
+        'jsonpickle',
+        'requests',
+        'pybase64'
+
     ],
     python_requires=">= 3.6",
     classifiers=[
