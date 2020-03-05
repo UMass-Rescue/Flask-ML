@@ -16,8 +16,8 @@ setup(
     license='MIT',
     author='Jagath Jai Kumar',
     author_email='jagath.jaikumar@gmail.com',
-    description='A Flask extension for running machine learning code',
-    long_description=long_description,
+    description="A Flask extension for running machine learning code",
+    long_description="A Flask extension for running machine learning code",
     py_modules=['flask_ml'],
     zip_safe=False,
     include_package_data=True,
@@ -37,7 +37,6 @@ setup(
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
-        'Programming Language :: Python3.6',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Software Development :: Libraries :: Python Modules'
     ]
