@@ -21,8 +21,15 @@ setup(
     include_package_data=True,
     platforms='any',
     install_requires=[
-        'Flask'
+        'Flask',
+        'numpy',
+        'pillow',
+        'jsonpickle',
+        'requests',
+        'pybase64'
+
     ],
+    python_requires=">= 3.6",
     classifiers=[
         'Environment :: Web Environment',
         'Intended Audience :: Developers',

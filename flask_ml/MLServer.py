@@ -1,4 +1,4 @@
-from flask import Flask, request, Response
+from flask import Flask, current_app, request, Response
 from .io_tools import *
 
 class MLServer(object):
@@ -36,7 +36,7 @@ class MLServer(object):
                 output["model"] = str(rule)[1:]
                 response = return_response(output, result)
                 response = Response(response=response, status=200, mimetype="application/json")
-                
+
                 return response
             return prep_ML
         return build_route

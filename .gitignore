@@ -1,1 +1,3 @@
 .DS_Store
+Flask_ML.egg-info/
+flask_ml/__pycache__/

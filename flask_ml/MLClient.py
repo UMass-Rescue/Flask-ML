@@ -17,9 +17,6 @@ class MLClient(object):
             data={"type":"single_image","name":input, "image":img}
         elif dtype == "single text":
             data={"type":"single_text","text":input}
-        return self.post_predict(data, endpoint)
-
-    def post_predict(self, data, endpoint):
         response = requests.post(os.path.join(self.HOST, endpoint), json=data)
         return json.loads(response.text)
 
