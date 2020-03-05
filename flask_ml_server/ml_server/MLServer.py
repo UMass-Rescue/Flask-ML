@@ -75,7 +75,7 @@ class MLServer(object):
                 data = request.get_json()
 
                 # converts image bytes to ndarray
-                ml_input = prepare_data(input, data)
+                ml_input = decode_data(input, data)
 
                 # run prediction function
                 result = ML_Function(ml_input)

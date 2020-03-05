@@ -13,7 +13,7 @@ from io import BytesIO
 import base64
 import jsonpickle
 
-def prepare_data(input_format, data):
+def decode_data(input_format, data):
     """Prepare input for machine learning. Image base64 strings will be
     converted to cv2 ndarray,
 
