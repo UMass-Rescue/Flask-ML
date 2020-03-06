@@ -11,12 +11,24 @@
 # CHANGE
 # ==============================================================================
 import requests
-import base64
 import os
 import json
+import numpy as np
+from encoder_decoder.dtypes import InputTypes, OutputTypes
+from encoder_decoder.default_config import decoders, encoders, extract_input, wrap_output
+import pdb
 # ==============================================================================
 
 
+def get_dtype(input):
+    if type(input) == str:
+        return OutputTypes.STRING
+    elif type(input) == float:
+        return OutputTypes.FLOAT
+    elif type(input) == np.ndarray:
+        return OutputTypes.FLOAT_NDARRAY
+    else:
+        raise ValueError(f'Type of input not supported. Got type as  - {type(input)}')
 
 class MLClient(object):
     """The MLClient object is a wrapper for making requests to an instance
@@ -34,34 +46,29 @@ class MLClient(object):
 
 
 
-    def predict(self, input, endpoint, dtype):
+    def predict(self, input, endpoint):
         """Encode data to input for ML and make post request to ML server.
 
         :param input: path_to_file to be used as input for model
 
         :param endpoint: model to use as classification. available
         rules can be found from get_models
-
-        :param dtype: type of data to be classified.
-        ["single image", "single_text"]
+        
         """
 # CHANGE
 # ==============================================================================
-        if dtype == "single image":
-            # open image and base64 encode
-            img = open(input, 'rb').read()
-            img = base64.b64encode(img).decode('utf-8')
-
-            # json format for post request
-            data={"type":"single_image","name":input, "image":img}
-
-        elif dtype == "single text":
-            # NOT currently supported
-            data={"type":"single_text","text":input}
+        data = {}
+        # pdb.set_trace()
+        input_type = get_dtype(input)
+        wrap_output[input_type](encoders[input_type](input), data)
+        data = json.dumps(data)
 # ==============================================================================
         # Make post request with given endpoint and json data
         response = requests.post(os.path.join(self.HOST, endpoint), json=data)
-        return json.loads(response.text)
+        response = json.loads(response.text)
+        output_type = InputTypes(response['output_type'])
+        result = decoders[output_type](extract_input[output_type](response))
+        return result
 
 
 
