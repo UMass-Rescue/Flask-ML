@@ -10,6 +10,7 @@
 # import flask_ml
 from flask_ml_server.ml_server import MLServer
 from encoder_decoder.dtypes import InputTypes, OutputTypes
+# import pdb
 # make a server instance
 serv = MLServer(__name__)
 
@@ -17,6 +18,7 @@ serv = MLServer(__name__)
 def tester(img):
     """Return image dimensions
     """
+    # pdb.set_trace()
     x = img.shape[1]
     y = img.shape[0]
     result = "x = {}, y = {}".format(x,y)

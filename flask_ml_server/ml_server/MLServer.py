@@ -10,6 +10,11 @@
 from flask import Flask, current_app, request, Response
 from encoder_decoder.dtypes import InputTypes, OutputTypes
 from encoder_decoder.default_config import encoders, decoders, extract_input, wrap_output
+import json
+import jsonpickle
+
+def create_response(output):
+    return jsonpickle.encode(output)
 
 class MLServer(object):
     """The MLServer object is a wrapper class for the flask app object. It
@@ -50,7 +55,8 @@ class MLServer(object):
         def build_route(ml_function):
             @self.app.route(rule,endpoint=ml_function.__name__,methods=['POST'])
             def prep_ML():
-                input_data = decoders[input_type](extract_input[input_type](request.get_json()))
+                data_dict = json.loads(request.get_json())
+                input_data = decoders[input_type](extract_input[input_type](data_dict))
                 result = ml_function(input_data)
                 output = {}
                 wrap_output[output_type](encoders[output_type](result), output) # TODO Any problem with inplace append to dict?
