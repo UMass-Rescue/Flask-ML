@@ -47,7 +47,7 @@ class MLServer(object):
                     routes.append('%s' % str(rule)[1:])
 
             # return routes as a pickled json object
-            response = return_response({},routes)
+            response = create_response(routes)
             return Response(response=response)
 
 

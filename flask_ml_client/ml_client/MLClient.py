@@ -39,8 +39,7 @@ class MLClient(object):
     def __init__(self, Host ='http://127.0.0.1:5000'):
         """Debugging...to be changed
 
-        :param HOST: specify the Host for connection
-        :param Port: specify the port for connection
+        :param Host: specify the Host for connection
         """
         self.HOST = Host
 
@@ -53,16 +52,13 @@ class MLClient(object):
 
         :param endpoint: model to use as classification. available
         rules can be found from get_models
-        
+
         """
-# CHANGE
-# ==============================================================================
         data = {}
         # pdb.set_trace()
         input_type = get_dtype(input)
         wrap[input_type](encoders[input_type](input), data)
         data = json.dumps(data)
-# ==============================================================================
         # Make post request with given endpoint and json data
         response = requests.post(os.path.join(self.HOST, endpoint), json=data)
         response = json.loads(response.text)
@@ -73,12 +69,12 @@ class MLClient(object):
 
 
     def get_models(self):
-        """Return available models as a dictionary of rule names
+        """Return available models as a list of rule names
         """
 
         # make get request to get_available_models
         r = requests.get(os.path.join(self.HOST, 'get_available_models'))
 
         # jsonify output and return
-        # format {"result":['function1', 'function2', ...]}
+        # format ['function1', 'function2', ...]
         return json.loads(r.text)
