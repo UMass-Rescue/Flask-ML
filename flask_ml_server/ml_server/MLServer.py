@@ -8,8 +8,8 @@
 """
 
 from flask import Flask, current_app, request, Response
-from encoder_decoder.dtypes import InputTypes, OutputTypes
-from encoder_decoder.default_config import encoders, decoders, extract_input, wrap_output
+from encoder_decoder import DTypes
+from encoder_decoder.default_config import encoders, decoders, extract, wrap
 import json
 import jsonpickle
 
@@ -51,15 +51,15 @@ class MLServer(object):
             return Response(response=response)
 
 
-    def route(self, rule, input_type:InputTypes, output_type:OutputTypes=OutputTypes.STRING):
+    def route(self, rule, input_type:DTypes, output_type:DTypes=DTypes.STRING):
         def build_route(ml_function):
             @self.app.route(rule,endpoint=ml_function.__name__,methods=['POST'])
             def prep_ML():
                 data_dict = json.loads(request.get_json())
-                input_data = decoders[input_type](extract_input[input_type](data_dict))
+                input_data = decoders[input_type](extract[input_type](data_dict))
                 result = ml_function(input_data)
                 output = {}
-                wrap_output[output_type](encoders[output_type](result), output) # TODO Any problem with inplace append to dict?
+                wrap[output_type](encoders[output_type](result), output) # TODO Any problem with inplace append to dict?
                 output['output_type'] = output_type.value
                 response = create_response(output)
                 response = Response(response=response, status=200, mimetype="application/json")

@@ -1,7 +1,5 @@
 import requests
 import numpy as np
-from encoder_decoder.dtypes_encode_decode import float_ndarray_to_dict
-from encoder_decoder.dtypes_extract_wrap import wrap_data
 import os
 import json
 from flask_ml_client.ml_client import MLClient
@@ -20,4 +18,4 @@ HOST = 'http://127.0.0.1:5000'
 # print(response.text)
 
 client = MLClient(HOST)
-print(client.predict(np.ones((5,215)), 'img_shape'))
+print(client.predict(np.ones((5,55)), 'img_shape'))

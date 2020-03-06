@@ -9,12 +9,12 @@
 
 # import flask_ml
 from flask_ml_server.ml_server import MLServer
-from encoder_decoder.dtypes import InputTypes, OutputTypes
+from encoder_decoder import DTypes
 # import pdb
 # make a server instance
 serv = MLServer(__name__)
 
-@serv.route('/img_shape', input_type=InputTypes.FLOAT_NDARRAY, output_type = OutputTypes.STRING)
+@serv.route('/img_shape', input_type=DTypes.FLOAT_NDARRAY, output_type = DTypes.STRING)
 def tester(img):
     """Return image dimensions
     """

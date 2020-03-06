@@ -14,19 +14,19 @@ import requests
 import os
 import json
 import numpy as np
-from encoder_decoder.dtypes import InputTypes, OutputTypes
-from encoder_decoder.default_config import decoders, encoders, extract_input, wrap_output
+from encoder_decoder import DTypes
+from encoder_decoder.default_config import decoders, encoders, extract, wrap
 import pdb
 # ==============================================================================
 
 
 def get_dtype(input):
     if type(input) == str:
-        return OutputTypes.STRING
+        return DTypes.STRING
     elif type(input) == float:
-        return OutputTypes.FLOAT
+        return DTypes.FLOAT
     elif type(input) == np.ndarray:
-        return OutputTypes.FLOAT_NDARRAY
+        return DTypes.FLOAT_NDARRAY
     else:
         raise ValueError(f'Type of input not supported. Got type as  - {type(input)}')
 
@@ -60,14 +60,14 @@ class MLClient(object):
         data = {}
         # pdb.set_trace()
         input_type = get_dtype(input)
-        wrap_output[input_type](encoders[input_type](input), data)
+        wrap[input_type](encoders[input_type](input), data)
         data = json.dumps(data)
 # ==============================================================================
         # Make post request with given endpoint and json data
         response = requests.post(os.path.join(self.HOST, endpoint), json=data)
         response = json.loads(response.text)
-        output_type = InputTypes(response['output_type'])
-        result = decoders[output_type](extract_input[output_type](response))
+        output_type = DTypes(response['output_type'])
+        result = decoders[output_type](extract[output_type](response))
         return result
 
 
