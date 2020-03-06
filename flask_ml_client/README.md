@@ -16,6 +16,7 @@ models = clie.get_models()
 print(models)
 
 # clie.predict will make a post request to the server and return the result
-result = clie.predict("tests/utils/dog.jpg","object_detection_alexnet", "single image")
+img_arr_np = read_image_in_numpy_arr("tests/utils/dog.jpg")
+result = clie.predict(img_arr_np, "object_detection_alexnet")
 print(result)
 ```
