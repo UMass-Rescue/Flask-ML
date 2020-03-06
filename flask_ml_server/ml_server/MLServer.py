@@ -60,6 +60,7 @@ class MLServer(object):
                 result = ml_function(input_data)
                 output = {}
                 wrap_output[output_type](encoders[output_type](result), output) # TODO Any problem with inplace append to dict?
+                output['output_type'] = output_type.value
                 response = create_response(output)
                 response = Response(response=response, status=200, mimetype="application/json")
                 return response
