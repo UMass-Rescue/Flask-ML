@@ -50,7 +50,7 @@ class MLServer(object):
         def build_route(ml_function):
             @self.app.route(rule,endpoint=ml_function.__name__,methods=['POST'])
             def prep_ML():
-                input_data = decoders[input_type](extract_input[input_type](request))
+                input_data = decoders[input_type](extract_input[input_type](request.get_json()))
                 result = ml_function(input_data)
                 output = {}
                 wrap_output[output_type](encoders[output_type](result), output) # TODO Any problem with inplace append to dict?

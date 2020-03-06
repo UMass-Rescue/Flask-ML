@@ -8,18 +8,18 @@
 """
 
 # import flask_ml
-from flask_ml import MLServer
-
+from flask_ml_server.ml_server import MLServer
+from encoder_decoder.dtypes import InputTypes, OutputTypes
 # make a server instance
 serv = MLServer(__name__)
 
-@serv.route('/img_shape')
+@serv.route('/img_shape', input_type=InputTypes.FLOAT_NDARRAY, output_type = OutputTypes.STRING)
 def tester(img):
     """Return image dimensions
     """
     x = img.shape[1]
     y = img.shape[0]
-    result = {"shape":{"x":x,"y":y}}
+    result = "x = {}, y = {}".format(x,y)
     return result
 
 # begin server instance

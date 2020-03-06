@@ -1,20 +1,24 @@
-# -*- coding: utf-8 -*-
-"""
-    tests.test_basic_classification
-    ~~~~~~~~~
-    This module uses MLClient to make server calls to the basic_server.
-    :copyright: 2020 Jagath Jai Kumar
-    :license: MIT
-"""
-# import MLClient
-from flask_ml import MLClient
+import requests
+import numpy as np
+from encoder_decoder.dtypes_encode_decode import float_ndarray_to_dict
+from encoder_decoder.dtypes_extract_wrap import wrap_data
+import os
+import json
 
-# make a client instance
-clie = MLClient()
+data = np.ndarray([1,1,1,1,1])
+HOST = 'http://127.0.0.1:5000'
+endpoint = "img_shape"
 
-# print available models json object
-models = clie.get_models()
-print(models)
+print(data.tostring())
+b = data.tostring()
 
-result = clie.predict("tests/utils/dog.jpg","img_shape", "single image")
-print(result)
+print(np.frombuffer(b))
+
+# data = wrap_data(float_ndarray_to_dict(data), {})
+#
+# print(type(data['data']['str']))
+#
+# data = json.dumps(data)
+
+# response = requests.post(os.path.join(HOST, endpoint), json=data)
+# print(response.text)
