@@ -6,11 +6,9 @@
     :copyright: 2020 Jagath Jai Kumar
     :license: MIT
 """
-
-# import flask_ml
 from flask_ml_server.ml_server import MLServer
 from encoder_decoder import DTypes
-# import pdb
+
 # make a server instance
 serv = MLServer(__name__)
 
@@ -23,6 +21,7 @@ def tester(img):
     y = img.shape[0]
     result = "x = {}, y = {}".format(x,y)
     return result
+
 
 # begin server instance
 serv.run()

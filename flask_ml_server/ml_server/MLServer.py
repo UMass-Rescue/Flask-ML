@@ -59,13 +59,14 @@ class MLServer(object):
                 input_data = decoders[input_type](extract[input_type](data_dict))
                 result = ml_function(input_data)
                 output = {}
-                wrap[output_type](encoders[output_type](result), output) # TODO Any problem with inplace append to dict?
+                wrap[output_type](encoders[output_type](result), output)
                 output['output_type'] = output_type.value
                 response = create_response(output)
                 response = Response(response=response, status=200, mimetype="application/json")
                 return response
             return prep_ML
         return build_route
+
 
     def run(self, host=None, port=None, debug=None, load_dotenv=True, **options):
         """Runs the application on a local development server.
