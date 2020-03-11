@@ -11,10 +11,16 @@ from flask import Flask, current_app, request, Response
 from encoder_decoder import DTypes
 from encoder_decoder.default_config import encoders, decoders, extract, wrap
 import json
-import jsonpickle
+import numpy as np
+
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)
 
 def create_response(output):
-    return jsonpickle.encode(output)
+    return json.dumps(output, cls = NumpyEncoder)
 
 class MLServer(object):
     """The MLServer object is a wrapper class for the flask app object. It
@@ -49,6 +55,7 @@ class MLServer(object):
             # return routes as a pickled json object
             response = create_response(routes)
             return Response(response=response)
+
 
 
     def route(self, rule, input_type:DTypes, output_type:DTypes=DTypes.STRING):
