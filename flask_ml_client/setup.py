@@ -24,11 +24,8 @@ setup(
     platforms='any',
     install_requires=[
         'numpy',
-        'pillow',
-        'jsonpickle',
         'requests',
-        'pybase64'
-
+        'encoder_decoder'
     ],
     python_requires=">= 3.6",
     classifiers=[

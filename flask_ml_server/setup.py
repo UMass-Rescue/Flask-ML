@@ -23,7 +23,9 @@ setup(
     include_package_data=True,
     platforms='any',
     install_requires=[
-        'Flask'
+        'Flask',
+        'numpy',
+        'encoder_decoder'
     ],
     python_requires=">= 3.6",
     classifiers=[
