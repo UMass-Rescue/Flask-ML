@@ -11,7 +11,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='flask-ml-server',
-    version='0.0.1',
+    version='0.0.2',
     url='https://github.com/UMass-Rescue',
     license='MIT',
     author='Jagath Jai Kumar',

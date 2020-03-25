@@ -3,6 +3,12 @@
 
 The MLClient object is a wrapper for making requests to an instance of the MLServer. It provides useful services for a client to make prediction calls to the server and receive outputs without having to format data
 
+### Installation
+
+```
+pip install flask-ml-client
+```
+
 ### Usage
 ```Python3
 # import MLClient

@@ -3,6 +3,12 @@
 ## MLServer
 The MLServer object is a wrapper class for the flask app object. It provides a decorator for turning a machine learning prediction function into a WebService on an applet.
 
+## Installation
+
+```
+pip install flask-ml-server
+```
+
 ### Usage
 ```Python3
 from flask_ml import MLServer

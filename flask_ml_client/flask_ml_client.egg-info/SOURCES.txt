@@ -1,0 +1,8 @@
+README.md
+setup.py
+flask_ml_client.egg-info/PKG-INFO
+flask_ml_client.egg-info/SOURCES.txt
+flask_ml_client.egg-info/dependency_links.txt
+flask_ml_client.egg-info/not-zip-safe
+flask_ml_client.egg-info/requires.txt
+flask_ml_client.egg-info/top_level.txt

@@ -1,0 +1,17 @@
+Metadata-Version: 1.2
+Name: flask-ml-server
+Version: 0.0.2
+Summary: A Flask extension for running machine learning code
+Home-page: https://github.com/UMass-Rescue
+Author: Jagath Jai Kumar
+Author-email: jagath.jaikumar@gmail.com
+License: MIT
+Description: A Flask extension for running machine learning code
+Platform: any
+Classifier: Environment :: Web Environment
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Internet :: WWW/HTTP :: Dynamic Content
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >= 3.6
