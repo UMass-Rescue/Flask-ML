@@ -11,18 +11,34 @@ pip install flask-ml-client
 
 ### Usage
 ```Python3
-# import MLClient
-from flask_ml import MLClient
+from flask_ml_client.ml_client import MLClient
+from sklearn.datasets import load_boston
 
-# make a client instance
-clie = MLClient()
+data = load_boston()
+datapoint_idx = 2
 
-# print available models json object
-models = clie.get_models()
-print(models)
+# the address at which the server is running.
+# 127.0.0.1 is the IP Address. 5000 is the port number. 
+# When "MLServer" is run, it'll output this address next to "Running on " text.
+HOST = 'http://127.0.0.1:5000'
 
-# clie.predict will make a post request to the server and return the result
-img_arr_np = read_image_in_numpy_arr("tests/utils/dog.jpg")
-result = clie.predict(img_arr_np, "object_detection_alexnet")
-print(result)
+client = MLClient(HOST)
+
+# get_models() returns all the available endpoints on the specified HOST
+models = client.get_models()
+print("Models: {}".format(models))
+
+# x is the input vector of features for which we need to predict the housing price
+x = data.data[datapoint_idx][None]
+print("Input data type : {}".format(type(x)))
+print("Input Data shape : {}".format(x.shape))
+
+# the endpoint we want to use in the server
+endpoint = 'housing_price_prediction'
+# sending the data to the endpoint on host and getting the results back
+result = client.predict(x, endpoint)
+
+print("Result data type : {}".format(type(result)))
+print(f'Actual value of the house : {data.target[datapoint_idx]}')
+print(f'Predicted value of the house : {result}')
 ```
