@@ -1,11 +1,19 @@
 # Flask-ML
 ![](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)
 
+Flask-ML helps users easily deploy their ML models as a web service. Flask-ML Server, similar to Flask, allows the user to specify web services using the decorator pattern. But Flask-ML server allows users to specify float ndarray and other datatypes used in ML as input and output types of the function being decorated. 
+
+Once the model is deployed using Flask-ML Server, users can then use Flask-ML client to call the web service made available through Flask-ML server. The client library provides a "predict" function that takes in the input to the ML webservice (float ndarray or other ML datatypes) and the endpoint of the service on the server as parameters, makes the call to the server and returns the output provided by the server (float ndarray or other ML datatypes). Flask-ML Client library is a library provided for convenience and isn't strictly required in order to make calls to Flask-ML Server. 
 
 ### Installation
 
+To install Flask-ML server -
 ```
 pip install flask-ml-server
+```
+
+To install Flask-ML client - 
+```
 pip install flask-ml-client
 ```
 
