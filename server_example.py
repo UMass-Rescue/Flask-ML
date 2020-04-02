@@ -31,4 +31,5 @@ def predict_housing_price(img):
     return model.predict(img)
 
 # begin server instance
-serv.run()
+# serv.run()
+app = serv.app # use command line "flask run" or "gunicorn -b localhost:5000 -w 4 server_example:app" to run the app
