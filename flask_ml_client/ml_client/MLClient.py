@@ -17,6 +17,7 @@ import numpy as np
 from encoder_decoder import DTypes
 from encoder_decoder.default_config import decoders, encoders, extract, wrap
 import pdb
+import warnings
 # ==============================================================================
 
 
@@ -36,12 +37,16 @@ class MLClient(object):
     calls to the server and receive outputs without having to format data
     """
 
-    def __init__(self, Host ='http://127.0.0.1:5000'):
+    def __init__(self, host=None):
         """Debugging...to be changed
 
-        :param Host: specify the Host for connection
+        :param host: specify the host for connection
         """
-        self.HOST = Host
+        if host is None:
+            host = 'http://127.0.0.1:5000'
+            warnings.warn(f'Host address not specified. Using default host address - {host}')
+
+        self.HOST = host
 
 
 
@@ -52,8 +57,12 @@ class MLClient(object):
 
         :param endpoint: model to use as classification. available
         rules can be found from get_models
-
         """
+        if input is None:
+            raise ValueError('The parameter "input" cannot be None')
+        if endpoint is None:
+            raise ValueError('The parameter "endpoint" cannot be None')
+
         data = {}
         # pdb.set_trace()
         input_type = get_dtype(input)

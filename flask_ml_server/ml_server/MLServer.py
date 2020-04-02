@@ -58,7 +58,21 @@ class MLServer(object):
 
 
 
-    def route(self, rule, input_type:DTypes, output_type:DTypes=DTypes.STRING):
+    def route(self, rule:str, input_type:DTypes, output_type:DTypes=DTypes.STRING):
+        '''
+        rule : str - the name of the endpoint
+        input_type : encoder_decoder.DTypes - the type of data parsing to be used for the input data
+        output_type : encoder_decoder.DTypes - the type of data parsing to be used for output of the decorated function
+        '''
+        if rule is None:
+            raise ValueError('The parameter "rule" cannot be None')
+        if input_type is None:
+            raise ValueError('The parameter "input_type" cannot be None')
+        if output_type is None:
+            raise ValueError('The parameter "output_type" cannot be None')
+        if type(rule) != str:
+            raise ValueError('The parameter "rule" is expected to be a string')
+
         def build_route(ml_function):
             @self.app.route(rule,endpoint=ml_function.__name__,methods=['POST'])
             def prep_ML():
