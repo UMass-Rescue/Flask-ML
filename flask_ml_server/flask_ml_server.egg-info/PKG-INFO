@@ -1,6 +1,6 @@
-Metadata-Version: 1.2
+Metadata-Version: 1.1
 Name: flask-ml-server
-Version: 0.0.2
+Version: 0.0.6
 Summary: A Flask extension for running machine learning code
 Home-page: https://github.com/UMass-Rescue
 Author: Jagath Jai Kumar
@@ -14,4 +14,3 @@ Classifier: License :: OSI Approved :: MIT License
 Classifier: Operating System :: OS Independent
 Classifier: Topic :: Internet :: WWW/HTTP :: Dynamic Content
 Classifier: Topic :: Software Development :: Libraries :: Python Modules
-Requires-Python: >= 3.6
