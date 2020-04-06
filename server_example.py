@@ -6,7 +6,7 @@
     :copyright: 2020 Jagath Jai Kumar
     :license: MIT
 """
-from flask_ml_server.ml_server import MLServer
+from flask_ml_server import MLServer
 from encoder_decoder import DTypes
 from sklearn.datasets import load_boston
 from sklearn.linear_model import LinearRegression

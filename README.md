@@ -24,7 +24,7 @@ In the following code, we will fit a Linear Regression model on the Boston Housi
 #### Server Code - 
 
 ```Python3
-from flask_ml_server.ml_server import MLServer
+from flask_ml_server import MLServer
 from encoder_decoder import DTypes
 from sklearn.datasets import load_boston
 from sklearn.linear_model import LinearRegression
@@ -54,7 +54,7 @@ serv.run()
 
 #### Client Code
 ```Python3
-from flask_ml_client.ml_client import MLClient
+from flask_ml_client import MLClient
 from sklearn.datasets import load_boston
 
 data = load_boston()

@@ -1,4 +1,4 @@
-from flask_ml_client.ml_client import MLClient
+from flask_ml_client import MLClient
 from sklearn.datasets import load_boston
 
 data = load_boston()
