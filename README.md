@@ -41,12 +41,12 @@ serv = MLServer(__name__)
 # adding the "housing_price_prediction" endpoint to the server. 
 # input_type and output_type are required parameters. They should be one among the available types in encoder_decoder.DTypes
 @serv.route('/housing_price_prediction', input_type=DTypes.FLOAT_NDARRAY, output_type=DTypes.FLOAT_NDARRAY)
-def predict_housing_price(img):
+def predict_housing_price(x):
     '''
-    img :: np.ndarray - array of features
+    x :: np.ndarray - array of features
     returns :: np.ndarray - housing price prediction
     '''
-    return model.predict(img)
+    return model.predict(x)
 
 # begin server instance
 serv.run()
