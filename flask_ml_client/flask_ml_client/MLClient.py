@@ -37,10 +37,9 @@ class MLClient(object):
     calls to the server and receive outputs without having to format data
     """
 
-    def __init__(self, host=None):
-        """Debugging...to be changed
-
-        :param host: specify the host for connection
+    def __init__(self, host:str=None):
+        """
+        :param host: specify the host for connection. Must include both the ip address and port number. Ex: 'http://127.0.0.1:5000'
         """
         if host is None:
             host = 'http://127.0.0.1:5000'
@@ -48,9 +47,7 @@ class MLClient(object):
 
         self.HOST = host
 
-
-
-    def predict(self, input, endpoint):
+    def predict(self, input, endpoint:str):
         """Encode data to input for ML and make post request to ML server.
 
         :param input: path_to_file to be used as input for model
@@ -74,8 +71,6 @@ class MLClient(object):
         output_type = DTypes(response['output_type'])
         result = decoders[output_type](extract[output_type](response))
         return result
-
-
 
     def get_models(self):
         """Return available models as a list of rule names
