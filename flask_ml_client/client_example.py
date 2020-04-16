@@ -7,13 +7,13 @@ datapoint_idx = 2
 # the address at which the server is running.
 # 127.0.0.1 is the IP Address. 5000 is the port number. 
 # When "MLServer" is run, it'll output this address next to "Running on " text.
-HOST = 'http://127.0.0.1:5000'
+HOST = 'http://127.0.0.1:8000'
 
 client = MLClient(HOST)
 
-# get_models() returns all the available endpoints on the specified HOST
-models = client.get_models()
-print("Models: {}".format(models))
+# # get_models() returns all the available endpoints on the specified HOST
+# models = client.get_models()
+# print("Models: {}".format(models))
 
 # x is the input vector of features for which we need to predict the housing price
 x = data.data[datapoint_idx][None]
