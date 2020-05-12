@@ -15,6 +15,11 @@ import json
 import numpy as np
 import pdb
 
+
+req_body = None
+with open('body.txt') as f:
+	req_body = f.read()
+
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, np.ndarray):
@@ -77,15 +82,19 @@ class MLServer(object):
         def build_route(ml_function):
             @self.app.post(rule)
             async def prep_ML(request:Request):
-                body = await request.json()
-                data_dict = json.loads(body)
+                # body = await request.json()
+                print('Read data')
+                data_dict = json.loads(req_body)
                 input_data = decoders[input_type](extract[input_type](data_dict))
+                print('About to run ML function')
                 result = ml_function(input_data)
+                print('ML func run')
                 output = {}
                 wrap[output_type](encoders[output_type](result), output)
                 output['output_type'] = output_type.value
                 response = create_response(output)
                 response = Response(content=response, status_code=200, media_type="application/json")
+                print('Returning response')
                 return response
             return prep_ML
         return build_route
