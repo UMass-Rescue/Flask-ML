@@ -20,6 +20,13 @@ import pdb
 import warnings
 # ==============================================================================
 
+class StatusCodeError(Exception):
+    def __init__(self, status_code:int):
+        '''
+        status_code - status code of the http response
+        '''
+        super(StatusCodeError, self).__init__(f'HTTP response code is not 200 (success). Got status code = {status_code}')
+        self.status_code = status_code
 
 def get_dtype(input):
     if type(input) == str:
@@ -67,6 +74,8 @@ class MLClient(object):
         data = json.dumps(data)
         # Make post request with given endpoint and json data
         response = requests.post(os.path.join(self.HOST, endpoint), json=data)
+        if response.status_code != 200:
+            raise StatusCodeError(response.status_code)
         response = json.loads(response.text)
         output_type = DTypes(response['output_type'])
         result = decoders[output_type](extract[output_type](response))
