@@ -42,23 +42,34 @@ class ErrorResponse(ServerResponse):
         super().__init__(message, status)
 
 
-class FileToTextResponse(ServerResponse):
+class TextResponse(ServerResponse):
     """
-    The FileToTextResponse class is a wrapper class for responses that map a file to a text response associated with it.
+    The TextResponse class helps generate a response object for textual responses.
     """
-    def __init__(self, results: list[dict], message: str="SUCCESS", status: int=200, text_key: str="text"):
+    def __init__(self, results: list[dict], message: str="SUCCESS", status: int=200):
         """
-        Instantiates the FileToTextResponse object.
-        results : list[dict] - the list of dictionaries containing the file name and the text associated with it
+        Instantiates the TextResponse object.
+        results : list - the list of dictionaries containing the file name or text and the result text associated with it
         Example:
         results = [
             {
                 "file_name": "file1.txt",
-                text_key: "Result for file1.txt"
+                "result": "Result for file1.txt"
             },
             {
                 "file_name": "file2.txt",
-                text_key: "Result for file2.txt"
+                "result": "Result for file2.txt"
+            }
+        ]
+        or 
+        results = [
+            {
+                "text": "This is the first text",
+                "result": "Result for first text"
+            },
+            {
+                "text": "This is the second text",
+                "result": "Result for second text"
             }
         ]
         """
