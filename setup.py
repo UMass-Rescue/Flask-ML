@@ -4,12 +4,12 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
-    name='flask-ml-server',
-    version='0.0.6',
-    url='https://github.com/UMass-Rescue',
+    name='flask-ml',
+    version='0.0.1',
+    url='https://github.com/UMass-Rescue/Flask-ML',
     license='MIT',
-    author='Jagath Jai Kumar',
-    author_email='jagath.jaikumar@gmail.com',
+    author='Prasanna Lakkur Subramanyam',
+    author_email='psubramanyam@umass.edu',
     description="A Flask extension for running machine learning code",
     long_description="A Flask extension for running machine learning code",
     packages=find_packages(),
@@ -18,8 +18,7 @@ setup(
     platforms='any',
     install_requires=[
         'Flask',
-        'numpy',
-        'encoder_decoder'
+        'requests'
     ],
     classifiers=[
         'Environment :: Web Environment',
