@@ -1,0 +1,28 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "flask_ml"
+version = "0.0.1"
+authors = [
+  { name="Prasanna Lakkur Subramanyam", email="psubramanyam@umass.edu" },
+]
+description = "A Flask extension for running machine learning code"
+readme = "README.md"
+requires-python = ">=3.3"
+classifiers = [
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
+dependencies = [
+    "Flask",
+    "requests"
+]
+
+[project.urls]
+Homepage = "https://github.com/UMass-Rescue/Flask-ML"
