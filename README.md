@@ -55,12 +55,6 @@ server = MLServer(__name__)
 def process_text(inputs:list, parameters:dict) -> dict:    
     return TextResponse(model.predict(inputs)).get_response()
 
-
-# Create an endpoint for Text -> Audio
-@server.route('/dummymodel', DataTypes.TEXT)
-def process_text(inputs:list, parameters:dict) -> dict:    
-    return TextResponse(model.predict(inputs)).get_response()
-
 # Run the server (optional. You can also run the server using the command line)
 server.run()
 ```
