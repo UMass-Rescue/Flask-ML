@@ -2,6 +2,7 @@ from flask import Flask, current_app, request, Response
 import json
 from .response import ErrorResponse
 
+
 class MLServer(object):
     """
     The MLServer object is a wrapper class for the flask app object. It
@@ -15,12 +16,11 @@ class MLServer(object):
         """
         self.app = Flask(name)
 
-
     def route(self, rule: str, input_type: str):
-        '''
+        """
         rule : str - the name of the endpoint
         input_type : str - the type of the input data
-        '''
+        """
         if rule is None:
             raise ValueError('The parameter "rule" cannot be None')
         if input_type is None:
@@ -29,21 +29,28 @@ class MLServer(object):
             raise ValueError('The parameter "rule" is expected to be a string')
 
         def build_route(ml_function):
-            @self.app.route(rule, endpoint=ml_function.__name__, methods=['POST'])
+            @self.app.route(rule, endpoint=ml_function.__name__, methods=["POST"])
             def wrapper():
                 data = request.get_json()
-                if 'data_type' not in data:
-                    return ErrorResponse('The input data must contain a "data_type" field', status=400).get_response()
-                if data['data_type'] != input_type:
-                    return ErrorResponse(f'The input data type must be {input_type}', status=400).get_response()
-                if 'inputs' not in data:
-                    return ErrorResponse('The input data must contain an "inputs" field', status=400).get_response()
-                inputs = data['inputs']
-                parameters = data['parameters'] if 'parameters' in data else {}
+                if "data_type" not in data:
+                    return ErrorResponse(
+                        'The input data must contain a "data_type" field', status=400
+                    ).get_response()
+                if data["data_type"] != input_type:
+                    return ErrorResponse(
+                        f"The input data type must be {input_type}", status=400
+                    ).get_response()
+                if "inputs" not in data:
+                    return ErrorResponse(
+                        'The input data must contain an "inputs" field', status=400
+                    ).get_response()
+                inputs = data["inputs"]
+                parameters = data["parameters"] if "parameters" in data else {}
                 return ml_function(inputs, parameters)
-            return wrapper
-        return build_route
 
+            return wrapper
+
+        return build_route
 
     def run(self, host=None, port=None, debug=None, load_dotenv=True, **options):
         """Runs the application on a local development server.

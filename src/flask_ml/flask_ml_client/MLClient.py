@@ -1,11 +1,13 @@
 import requests
 
-UNKNOWN_ERROR = 'Unknown error. Please refer to the status_code field.'
+UNKNOWN_ERROR = "Unknown error. Please refer to the status_code field."
+
 
 class MLClient:
     """
     The MLClient class is a wrapper class for making requests to the MLServer object.
     """
+
     def __init__(self, url: str):
         """
         Instantiates the MLClient object.
@@ -30,7 +32,9 @@ class MLClient:
         if type(data_type) != str:
             raise ValueError('The parameter "data_type" is expected to be a string')
 
-    def request(self, inputs: list[dict], data_type: str, parameters: dict = {}) -> dict:
+    def request(
+        self, inputs: list[dict], data_type: str, parameters: dict = {}
+    ) -> dict:
         """
         Sends a request to the server.
         inputs : list - the list of dictionaries containing the data to be sent to the server
@@ -38,9 +42,12 @@ class MLClient:
         parameters : dict - the parameters to be sent to the server
         """
         self._validate_request_parameters(inputs, data_type)
-        response = requests.post(self.url, json={'inputs': inputs, 'data_type': data_type, 'parameters': parameters})
-        if 'application/json' not in response.headers.get('Content-Type', ''):
-            return {'status': UNKNOWN_ERROR, 'status_code': response.status_code}
+        response = requests.post(
+            self.url,
+            json={"inputs": inputs, "data_type": data_type, "parameters": parameters},
+        )
+        if "application/json" not in response.headers.get("Content-Type", ""):
+            return {"status": UNKNOWN_ERROR, "status_code": response.status_code}
         data = response.json()
-        data['status_code'] = response.status_code
+        data["status_code"] = response.status_code
         return data
