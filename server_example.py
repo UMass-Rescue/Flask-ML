@@ -1,35 +1,43 @@
-# -*- coding: utf-8 -*-
-"""
-    tests.test_basic_server
-    ~~~~~~~~~
-    This module uses MLServer to make a basic server.
-    :copyright: 2020 Jagath Jai Kumar
-    :license: MIT
-"""
-from flask_ml_server import MLServer
-from encoder_decoder import DTypes
-from sklearn.datasets import load_boston
-from sklearn.linear_model import LinearRegression
+from flask_ml.flask_ml_server import MLServer
+from flask_ml.flask_ml_server.constants import DataTypes
+from flask_ml.flask_ml_server.response import TextResponse
 
-# loading the Boston Housing Price Prediction dataset
-data = load_boston()
-# fitting a Linear Regression model to the housing data
-model = LinearRegression()
-model.fit(data.data, data.target)
 
-# make a server instance
-serv = MLServer(__name__)
+# Create a dummy ML model
+class DummyModel:
+    def __init__(self):
+        self.counter = 0
 
-# adding the "housing_price_prediction" endpoint to the server. 
-# input_type and output_type are required parameters. They should be one among the available types in encoder_decoder.DTypes
-@serv.route('/housing_price_prediction', input_type=DTypes.FLOAT_NDARRAY, output_type=DTypes.FLOAT_NDARRAY)
-def predict_housing_price(x):
-    '''
-    x :: np.ndarray - array of features
-    returns :: np.ndarray - housing price prediction
-    '''
-    return model.predict(x)
+    def predict(self, data: list) -> list:
+        res = []
+        for d in data:
+            res.append({"counter": self.counter, "text": d["text"]})
+            self.counter += 1
+        return res
 
-# begin server instance
-# serv.run()
-app = serv.app # use command line "flask run" or "gunicorn -b localhost:5000 -w 4 server_example:app" to run the app
+
+# create an instance of the model
+model = DummyModel()
+
+# Create a server
+server = MLServer(__name__)
+
+
+# Create an endpoint
+@server.route("/dummymodel", DataTypes.TEXT)
+def process_text(inputs: list, parameters: dict) -> dict:
+    return TextResponse(model.predict(inputs)).get_response()
+
+
+# Run the server (optional. You can also run the server using the command line)
+server.run()
+
+# Expected request json format:
+# {
+#     "inputs": [
+#         {"text": "Text to be classified"},
+#         {"text": "Another text to be classified"}
+#     ],
+#     "data_type": "TEXT",
+#     "parameters": {}
+# }

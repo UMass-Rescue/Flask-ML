@@ -1,30 +1,14 @@
-from flask_ml_client import MLClient
-from sklearn.datasets import load_boston
+from flask_ml.flask_ml_client import MLClient
+from flask_ml.flask_ml_server.constants import DataTypes
 
-data = load_boston()
-datapoint_idx = 2
+url = "http://127.0.0.1:5000/dummymodel"  # The URL of the server
+client = MLClient(url)  # Create an instance of the MLClient object
 
-# the address at which the server is running.
-# 127.0.0.1 is the IP Address. 5000 is the port number. 
-# When "MLServer" is run, it'll output this address next to "Running on " text.
-HOST = 'http://127.0.0.1:5000'
+inputs = [
+    {"text": "Text to be classified"},
+    {"text": "Another text to be classified"},
+]  # The inputs to be sent to the server
+data_type = DataTypes.TEXT  # The type of the input data
 
-client = MLClient(HOST)
-
-# get_models() returns all the available endpoints on the specified HOST
-models = client.get_models()
-print("Models: {}".format(models))
-
-# x is the input vector of features for which we need to predict the housing price
-x = data.data[datapoint_idx][None]
-print("Input data type : {}".format(type(x)))
-print("Input Data shape : {}".format(x.shape))
-
-# the endpoint we want to use in the server
-endpoint = 'housing_price_prediction'
-# sending the data to the endpoint on host and getting the results back
-result = client.predict(x, endpoint)
-
-print("Result data type : {}".format(type(result)))
-print(f'Actual value of the house : {data.target[datapoint_idx]}')
-print(f'Predicted value of the house : {result}')
+response = client.request(inputs, data_type)  # Send a request to the server
+print(response)  # Print the response
