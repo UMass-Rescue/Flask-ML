@@ -1,6 +1,7 @@
 from flask import Response
 import json
 
+
 class ServerResponse:
     """
     The ServerResponse class is a wrapper class for server responses.
@@ -42,7 +43,27 @@ class ErrorResponse(ServerResponse):
         super().__init__(message, status)
 
 
-class TextResponse(ServerResponse):
+class MLResponse(ServerResponse):
+    """
+    The MLResponse class is an abstraction for machine learning responses.
+    """
+    def __init__(self, results: list[dict], message: str="SUCCESS", status: int=200):
+        """
+        Instantiates the MLResponse object.
+        """
+        super().__init__(message, status)
+        self.results = results
+
+    def get_response_dict(self):
+        """
+        Returns the response dictionary.
+        """
+        response_di = super().get_response_dict()
+        response_di['results'] = self.results
+        return response_di
+
+
+class TextResponse(MLResponse):
     """
     The TextResponse class helps generate a response object for textual responses.
     """
@@ -73,13 +94,59 @@ class TextResponse(ServerResponse):
             }
         ]
         """
-        super().__init__(message, status)
-        self.results = results
+        super().__init__(results, message, status)
 
-    def get_response_dict(self):
+
+class FileResponse(MLResponse):
+    """
+    The FileResponse class helps generate a response object for textual responses.
+    """
+    def __init__(self, results: list[dict], message: str="SUCCESS", status: int=200):
         """
-        Returns the response dictionary.
+        Instantiates the FileResponse object.
+        results : list - the list of dictionaries containing the file name or text and the resulting file associated with it
+        Example:
+        results = [
+            {
+                "file_name": "file1.txt",
+                "result": "output_file1.txt"
+            },
+            {
+                "file_name": "file2.txt",
+                "result": "output_file2.txt"
+            }
+        ]
+        or 
+        results = [
+            {
+                "text": "This is the first text",
+                "result": "output_file1.txt"
+            },
+            {
+                "text": "This is the second text",
+                "result": "output_file2.txt"
+            }
+        ]
         """
-        response_di = super().get_response_dict()
-        response_di['results'] = self.results
-        return response_di
+        super().__init__(results, message, status)
+
+
+class ImageResponse(FileResponse):
+    """
+    May do some image specific stuff in future.
+    """
+    pass
+
+
+class VideoResponse(FileResponse):
+    """
+    May do some video specific stuff in future.
+    """
+    pass
+
+
+class AudioResponse(FileResponse):
+    """
+    May do some audio specific stuff in future.
+    """
+    pass
