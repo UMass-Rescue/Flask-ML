@@ -1,6 +1,7 @@
 from flask import Flask, request
+from pydantic import ValidationError
 
-from .models import RequestModel
+from .models import RequestModel, ErrorResponseModel
 
 
 class MLServer(object):
@@ -31,9 +32,23 @@ class MLServer(object):
         def build_route(ml_function):
             @self.app.route(rule, endpoint=ml_function.__name__, methods=["POST"])
             def wrapper():
-                data = request.get_json()
-                data = RequestModel(**data)
-                return ml_function(data.inputs, data.parameters)
+                try:
+                    data = request.get_json()
+                    data = RequestModel(**data)
+                    return ml_function(data.inputs, data.parameters)
+                except ValidationError as e:
+                    error_details = e.errors()
+                    error_details = [
+                        {
+                            "type": err.get("type", ""),
+                            "input": err.get("input", ""),
+                            "msg": err.get("msg", ""),
+                        }
+                        for err in error_details
+                    ]
+                    return ErrorResponseModel(
+                        status="VALIDATION_ERROR", errors=error_details
+                    ).get_response()
 
             return wrapper
 
