@@ -13,7 +13,9 @@ class TextInput(MLInput):
 
 
 class FileInput(MLInput):
-    file_path: str = Field(..., description="Path of the file to be processed", min_length=1)
+    file_path: str = Field(
+        ..., description="Path of the file to be processed", min_length=1
+    )
 
 
 class RequestModel(BaseModel):
@@ -71,13 +73,15 @@ class RequestModel(BaseModel):
 
 class MLResult(BaseModel):
     result: Any = Field(
-        ..., description="The result, which can be any JSON-serializable object"
+        ...,
+        description="The result, which can be any JSON-serializable object",
+        min_length=1,
     )
 
 
 class FileResult(MLResult):
     file_path: str = Field(
-        ..., description="Path of the file associated with the result"
+        ..., description="Path of the file associated with the result", min_length=1
     )
 
 
@@ -109,10 +113,14 @@ class ResponseModel(BaseModel):
     """
 
     status: str = Field(
-        default="SUCCESS", description="The status of the operation, e.g., 'SUCCESS'"
+        default="SUCCESS",
+        description="The status of the operation, e.g., 'SUCCESS'",
+        min_length=1,
     )
     results: List[Union[TextResult, ImageResult, AudioResult, VideoResult]] = Field(
-        ..., description="List of results, each either a file or text with its result"
+        ...,
+        description="List of results, each either a file or text with its result",
+        min_length=1,
     )
 
     def get_response(self, status_code: int = 200):
