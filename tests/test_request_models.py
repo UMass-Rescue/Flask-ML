@@ -1,6 +1,6 @@
 import unittest
 
-from models import FileInput, RequestModel, TextInput
+from flask_ml.flask_ml_server.models import FileInput, RequestModel, TextInput
 from pydantic import ValidationError
 
 

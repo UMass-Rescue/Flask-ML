@@ -1,25 +1,25 @@
 import unittest
 from typing import Any
 
-from models import FileResult, ResponseModel, TextResult
+from flask_ml.flask_ml_server.models import FileResult, ResponseModel, TextResult
 from pydantic import ValidationError
 
 
 class TestFileResultModel(unittest.TestCase):
     def test_valid_file_result(self):
-        data = {"file_name": "file1.txt", "result": "output_file1.txt"}
+        data = {"file_path": "file1.txt", "result": "output_file1.txt"}
         result = FileResult(**data)
-        self.assertEqual(result.file_name, "file1.txt")
+        self.assertEqual(result.file_path, "file1.txt")
         self.assertEqual(result.result, "output_file1.txt")
 
-    def test_invalid_file_result_missing_file_name(self):
+    def test_invalid_file_result_missing_file_path(self):
         data = {"result": "output_file1.txt"}
         with self.assertRaises(ValidationError):
             FileResult(**data)
 
     def test_valid_file_result_with_complex_result(self):
         data = {
-            "file_name": "file1.txt",
+            "file_path": "file1.txt",
             "result": {"key": "value", "nested": [1, 2, 3]},
         }
         result = FileResult(**data)
@@ -56,15 +56,15 @@ class TestResponseModel(unittest.TestCase):
         data = {
             "status": "success",
             "results": [
-                {"file_name": "file1.txt", "result": "output_file1.txt"},
-                {"file_name": "file2.txt", "result": "output_file2.txt"},
+                {"file_path": "file1.txt", "result": "output_file1.txt"},
+                {"file_path": "file2.txt", "result": "output_file2.txt"},
             ],
         }
         response = ResponseModel(**data)
         self.assertEqual(response.status, "success")
         self.assertEqual(len(response.results), 2)
         self.assertIsInstance(response.results[0], FileResult)
-        self.assertEqual(response.results[0].file_name, "file1.txt")
+        self.assertEqual(response.results[0].file_path, "file1.txt")
 
     def test_valid_response_with_text_results(self):
         data = {
@@ -84,7 +84,7 @@ class TestResponseModel(unittest.TestCase):
         data = {
             "status": "success",
             "results": [
-                {"file_name": "file1.txt", "result": "output_file1.txt"},
+                {"file_path": "file1.txt", "result": "output_file1.txt"},
                 {"text": "This is the second text", "result": "output_file2.txt"},
             ],
         }
@@ -94,7 +94,7 @@ class TestResponseModel(unittest.TestCase):
         self.assertIsInstance(response.results[1], TextResult)
 
     def test_valid_response_with_missing_status(self):
-        data = {"results": [{"file_name": "file1.txt", "result": "output_file1.txt"}]}
+        data = {"results": [{"file_path": "file1.txt", "result": "output_file1.txt"}]}
         response = ResponseModel(**data)
         self.assertEqual(response.status, "SUCCESS")
 
@@ -102,7 +102,7 @@ class TestResponseModel(unittest.TestCase):
         data = {
             "status": "success",
             "results": [
-                {"file_name": "file1.txt"},
+                {"file_path": "file1.txt"},
                 {"text": "This is the second text"},
             ],
         }
