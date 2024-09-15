@@ -127,7 +127,7 @@ class ResponseModel(BaseModel):
 
     def get_response(self, status_code: int = 200):
         return Response(
-            response=self.json(),
+            response=self.model_dump_json(),
             status=status_code,
             mimetype="application/json",
         )
