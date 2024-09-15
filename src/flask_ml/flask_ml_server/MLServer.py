@@ -1,8 +1,5 @@
-import json
-
-from flask import Flask, Response, current_app, request
-
-from .response import ErrorResponse
+from flask import Flask, request
+from .models import RequestModel
 
 
 class MLServer(object):
@@ -34,21 +31,8 @@ class MLServer(object):
             @self.app.route(rule, endpoint=ml_function.__name__, methods=["POST"])
             def wrapper():
                 data = request.get_json()
-                if "data_type" not in data:
-                    return ErrorResponse(
-                        'The input data must contain a "data_type" field', status=400
-                    ).get_response()
-                if data["data_type"] != input_type:
-                    return ErrorResponse(
-                        f"The input data type must be {input_type}", status=400
-                    ).get_response()
-                if "inputs" not in data:
-                    return ErrorResponse(
-                        'The input data must contain an "inputs" field', status=400
-                    ).get_response()
-                inputs = data["inputs"]
-                parameters = data["parameters"] if "parameters" in data else {}
-                return ml_function(inputs, parameters)
+                data = RequestModel(**data)
+                return ml_function(data["inputs"], data["parameters"])
 
             return wrapper
 
