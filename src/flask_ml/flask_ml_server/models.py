@@ -31,7 +31,7 @@ class RequestModel(BaseModel):
         ValueError: If the inputs do not match the data_type.
     """
 
-    inputs: List[MLInput] = Field(
+    inputs: List[Union[TextInput, FileInput]] = Field(
         ..., description="List of input items to be processed"
     )
     data_type: str = Field(
@@ -107,7 +107,7 @@ class ResponseModel(BaseModel):
     status: str = Field(
         default="SUCCESS", description="The status of the operation, e.g., 'SUCCESS'"
     )
-    results: List[MLResult] = Field(
+    results: List[Union[TextResult, ImageResult, AudioResult, VideoResult]] = Field(
         ..., description="List of results, each either a file or text with its result"
     )
 
