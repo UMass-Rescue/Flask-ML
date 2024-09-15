@@ -9,11 +9,11 @@ class MLInput(BaseModel):
 
 
 class TextInput(MLInput):
-    text: str = Field(..., description="Text to be processed")
+    text: str = Field(..., description="Text to be processed", min_length=1)
 
 
 class FileInput(MLInput):
-    file_path: str = Field(..., description="Path of the file to be processed")
+    file_path: str = Field(..., description="Path of the file to be processed", min_length=1)
 
 
 class RequestModel(BaseModel):
@@ -32,10 +32,14 @@ class RequestModel(BaseModel):
     """
 
     inputs: List[Union[TextInput, FileInput]] = Field(
-        ..., description="List of input items to be processed"
+        ...,
+        description="List of input items to be processed",
+        min_length=1,
     )
     data_type: str = Field(
-        ..., description="Type of the data, should be TEXT, IMAGE, VIDEO, or AUDIO"
+        ...,
+        description="Type of the data, should be TEXT, IMAGE, VIDEO, or AUDIO",
+        min_length=1,
     )
     parameters: Dict = Field(
         default_factory=dict, description="Additional parameters for the ML model"
