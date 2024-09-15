@@ -4,16 +4,20 @@ from flask import Response
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 
-class TextInput(BaseModel):
+class MLInput(BaseModel):
+    pass
+
+
+class TextInput(MLInput):
     text: str = Field(..., description="Text to be processed")
 
 
-class FileInput(BaseModel):
+class FileInput(MLInput):
     file_path: str = Field(..., description="Path of the file to be processed")
 
 
 class RequestModel(BaseModel):
-    inputs: List[Union[TextInput, FileInput]] = Field(
+    inputs: List[MLInput] = Field(
         ..., description="List of input items to be processed"
     )
     data_type: str = Field(
