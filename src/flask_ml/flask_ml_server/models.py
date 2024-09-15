@@ -47,12 +47,15 @@ class RequestModel(BaseModel):
         return values
 
 
-class FileResult(BaseModel):
-    file_path: str = Field(
-        ..., description="Path of the file associated with the result"
-    )
+class MLResult(BaseModel):
     result: Any = Field(
         ..., description="The result, which can be any JSON-serializable object"
+    )
+
+
+class FileResult(MLResult):
+    file_path: str = Field(
+        ..., description="Path of the file associated with the result"
     )
 
 
@@ -68,16 +71,13 @@ class AudioResult(FileResult):
     pass
 
 
-class TextResult(BaseModel):
+class TextResult(MLResult):
     text: str = Field(..., description="The text content associated with the result")
-    result: Any = Field(
-        ..., description="The result, which can be any JSON-serializable object"
-    )
 
 
 class ResponseModel(BaseModel):
     status: str = Field(..., description="The status of the operation, e.g., 'success'")
-    results: List[Union[FileResult, TextResult]] = Field(
+    results: List[MLResult] = Field(
         ..., description="List of results, each either a file or text with its result"
     )
 
