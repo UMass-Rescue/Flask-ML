@@ -6,7 +6,7 @@ from flask_ml.flask_ml_server.models import ResponseModel, TextResult
 # Create a dummy ML model
 class DummyModel:
     def predict(self, data: list) -> list:
-        return list(range(len(data)))  # Return 0 to len(data) - 1
+        return [str(e) for e in range(len(data))]  # Return 0 to len(data) - 1
 
 
 # create an instance of the model
