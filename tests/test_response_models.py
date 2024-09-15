@@ -1,7 +1,14 @@
 import unittest
 from typing import Any
 
-from flask_ml.flask_ml_server.models import FileResult, ResponseModel, TextResult
+from flask_ml.flask_ml_server.models import (
+    FileResult,
+    ResponseModel,
+    TextResult,
+    ImageResult,
+    AudioResult,
+    VideoResult,
+)
 from pydantic import ValidationError
 
 
@@ -115,6 +122,39 @@ class TestResponseModel(unittest.TestCase):
         }
         with self.assertRaises(ValidationError):
             ResponseModel(**data)
+
+    def test_get_response_success(self):
+        response_model = ResponseModel(
+            status="SUCCESS",
+            results=[
+                TextResult(result="Processed text", text="Sample text"),
+                ImageResult(result="Processed image", file_path="/path/to/image.png"),
+                AudioResult(result="Processed audio", file_path="/path/to/audio.mp3"),
+                VideoResult(result="Processed video", file_path="/path/to/video.mp4"),
+            ],
+        )
+        response = response_model.get_response()
+        assert response.status_code == 200
+        assert response.mimetype == "application/json"
+        response_data = response.get_json()
+        assert response_data["status"] == "SUCCESS"
+        assert len(response_data["results"]) == 4
+
+    def test_get_response_custom_status_code(self):
+        response_model = ResponseModel(
+            status="SUCCESS",
+            results=[TextResult(result="Processed text", text="Sample text")],
+        )
+        response = response_model.get_response(status_code=201)
+        assert response.status_code == 201
+        assert response.mimetype == "application/json"
+        response_data = response.get_json()
+        assert response_data["status"] == "SUCCESS"
+        assert len(response_data["results"]) == 1
+
+    def test_response_model_validation_error(self):
+        with self.assertRaises(ValidationError):
+            ResponseModel(status="SUCCESS", results=[{"result": "Invalid result type"}])
 
 
 if __name__ == "__main__":
