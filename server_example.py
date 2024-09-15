@@ -20,7 +20,7 @@ server = MLServer(__name__)
 @server.route("/dummymodel", DataTypes.TEXT)
 def process_text(inputs: list, parameters: dict) -> dict:
     results = model.predict(inputs)
-    results = [TextResult(text=e["text"], result=r) for e, r in zip(inputs, results)]
+    results = [TextResult(text=e.text, result=r) for e, r in zip(inputs, results)]
     response = ResponseModel(results=results)
     return response.get_response()
 
