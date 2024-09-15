@@ -29,11 +29,11 @@ class MLClient:
         request_model = RequestModel(inputs=inputs, data_type=data_type, parameters=parameters)
         response = requests.post(
             self.url,
-            json=request_model.dict(),
+            json=request_model.model_dump(),
         )
         if "application/json" not in response.headers.get("Content-Type", ""):
             return ErrorResponseModel(status=f"Unknown error. status_code={str(response.status_code)}", errors=[{"msg": UNKNOWN_ERROR}]).dict()
         if response.status_code != 200:
-            return ErrorResponseModel(**response.json()).dict()
+            return ErrorResponseModel(**response.json()).model_dump()
         response_model = ResponseModel(**response.json())
-        return response_model.dict()["results"]
+        return response_model.model_dump()["results"]
