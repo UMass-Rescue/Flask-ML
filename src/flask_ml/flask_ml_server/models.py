@@ -98,7 +98,9 @@ class AudioResult(FileResult):
 
 
 class TextResult(MLResult):
-    text: str = Field(..., description="The text content associated with the result")
+    text: str = Field(
+        ..., description="The text content associated with the result", min_length=1
+    )
 
 
 class ResponseModel(BaseModel):
