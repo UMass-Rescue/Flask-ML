@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "flask_ml"
-version = "0.0.1"
+version = "0.0.5"
 authors = [
   { name="Prasanna Lakkur Subramanyam", email="psubramanyam@umass.edu" },
 ]
@@ -21,7 +21,8 @@ classifiers = [
 ]
 dependencies = [
     "Flask",
-    "requests"
+    "requests",
+    "pydantic"
 ]
 
 [project.urls]
