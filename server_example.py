@@ -1,19 +1,12 @@
 from flask_ml.flask_ml_server import MLServer
 from flask_ml.flask_ml_server.constants import DataTypes
-from flask_ml.flask_ml_server.response import TextResponse
+from flask_ml.flask_ml_server.models import ResponseModel, TextResult
 
 
 # Create a dummy ML model
 class DummyModel:
-    def __init__(self):
-        self.counter = 0
-
     def predict(self, data: list) -> list:
-        res = []
-        for d in data:
-            res.append({"counter": self.counter, "text": d["text"]})
-            self.counter += 1
-        return res
+        return list(range(len(data)))  # Return 0 to len(data) - 1
 
 
 # create an instance of the model
@@ -26,7 +19,10 @@ server = MLServer(__name__)
 # Create an endpoint
 @server.route("/dummymodel", DataTypes.TEXT)
 def process_text(inputs: list, parameters: dict) -> dict:
-    return TextResponse(model.predict(inputs)).get_response()
+    results = model.predict(inputs)
+    results = [TextResult(text=e["text"], result=r) for e, r in zip(inputs, results)]
+    response = ResponseModel(results=results)
+    return response.get_response()
 
 
 # Run the server (optional. You can also run the server using the command line)
