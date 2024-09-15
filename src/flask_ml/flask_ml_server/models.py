@@ -2,8 +2,6 @@ from typing import Any, Dict, List, Union
 
 from flask import Response
 from pydantic import BaseModel, Field, field_validator, model_validator
-from typing import List
-from pydantic import Field
 
 
 class MLInput(BaseModel):
@@ -32,6 +30,7 @@ class RequestModel(BaseModel):
         ValueError: If the data_type is not one of TEXT, IMAGE, VIDEO, or AUDIO.
         ValueError: If the inputs do not match the data_type.
     """
+
     inputs: List[MLInput] = Field(
         ..., description="List of input items to be processed"
     )
@@ -104,7 +103,10 @@ class ResponseModel(BaseModel):
         get_response(status_code: int = 200) -> Response:
             Returns a Flask Response object with the JSON representation of the model.
     """
-    status: str = Field(..., description="The status of the operation, e.g., 'success'")
+
+    status: str = Field(
+        default="SUCCESS", description="The status of the operation, e.g., 'SUCCESS'"
+    )
     results: List[MLResult] = Field(
         ..., description="List of results, each either a file or text with its result"
     )

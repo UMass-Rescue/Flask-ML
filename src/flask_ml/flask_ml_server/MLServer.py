@@ -33,7 +33,7 @@ class MLServer(object):
             def wrapper():
                 data = request.get_json()
                 data = RequestModel(**data)
-                return ml_function(data["inputs"], data["parameters"])
+                return ml_function(data.inputs, data.parameters)
 
             return wrapper
 
