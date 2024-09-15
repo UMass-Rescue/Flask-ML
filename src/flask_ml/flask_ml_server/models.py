@@ -131,3 +131,29 @@ class ResponseModel(BaseModel):
             status=status_code,
             mimetype="application/json",
         )
+
+
+class ErrorResponseModel(BaseModel):
+    """
+    Model representing an error response.
+    Attributes:
+        status (str): The status of the operation, e.g., 'error'
+        detail (str): Details about the error that occurred.
+    Methods:
+        get_response(status_code: int = 400) -> Response:
+            Returns a Flask Response object with the JSON representation of the model.
+    """
+
+    status: str = Field(
+        default="ERROR",
+        description="The status of the operation, e.g., 'ERROR'",
+        min_length=1,
+    )
+    errors: List = Field(..., description="Details about the error that occurred")
+
+    def get_response(self, status_code: int = 400):
+        return Response(
+            response=self.model_dump_json(),
+            status=status_code,
+            mimetype="application/json",
+        )
