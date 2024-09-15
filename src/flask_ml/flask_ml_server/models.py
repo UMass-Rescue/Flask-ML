@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, field_validator, model_validator
-from typing import List, Union, Dict
+from typing import List, Union, Dict, Any
 
 
 class TextInput(BaseModel):
@@ -43,3 +43,18 @@ class RequestModel(BaseModel):
                     f"All inputs must contain 'file_path' when data_type is {data_type}"
                 )
         return values
+
+
+class FileResult(BaseModel):
+    file_path: str = Field(..., description="Path of the file associated with the result")
+    result: Any = Field(..., description="The result, which can be any JSON-serializable object")
+
+
+class TextResult(BaseModel):
+    text: str = Field(..., description="The text content associated with the result")
+    result: Any = Field(..., description="The result, which can be any JSON-serializable object")
+
+
+class ResponseModel(BaseModel):
+    status: str = Field(..., description="The status of the operation, e.g., 'success'")
+    results: List[Union[FileResult, TextResult]] = Field(..., description="List of results, each either a file or text with its result")

@@ -1,127 +1,132 @@
-import pytest
+import unittest
 from pydantic import ValidationError
-from flask_ml.flask_ml_server.models import TextInput, FileInput, RequestModel
+from models import RequestModel, FileInput, TextInput
 
 
-def test_text_input():
-    text_input = TextInput(text="Sample text")
-    assert text_input.text == "Sample text"
+class TestFileInputModel(unittest.TestCase):
+    def test_valid_file_input(self):
+        data = {"file_path": "/path/to/file.txt"}
+        file_input = FileInput(**data)
+        self.assertEqual(file_input.file_path, "/path/to/file.txt")
+    
+    def test_invalid_file_input_missing_file_path(self):
+        data = {}
+        with self.assertRaises(ValidationError):
+            FileInput(**data)
+
+    def test_invalid_file_input_empty_file_path(self):
+        data = {"file_path": ""}
+        with self.assertRaises(ValidationError):
+            FileInput(**data)
 
 
-def test_file_input():
-    file_input = FileInput(file_path="/path/to/file")
-    assert file_input.file_path == "/path/to/file"
+class TestTextInputModel(unittest.TestCase):
+    def test_valid_text_input(self):
+        data = {"text": "This is a sample text"}
+        text_input = TextInput(**data)
+        self.assertEqual(text_input.text, "This is a sample text")
+    
+    def test_invalid_text_input_missing_text(self):
+        data = {}
+        with self.assertRaises(ValidationError):
+            TextInput(**data)
+
+    def test_invalid_text_input_empty_text(self):
+        data = {"text": ""}
+        with self.assertRaises(ValidationError):
+            TextInput(**data)
 
 
-def test_request_model_with_text_inputs():
-    json_data = {
-        "inputs": [
-            {"text": "Text to be classified"},
-            {"text": "Another text to be classified"},
-        ],
-        "data_type": "TEXT",
-        "parameters": {},
-    }
-    request_model = RequestModel(**json_data)
-    assert request_model.data_type == "TEXT"
-    assert len(request_model.inputs) == 2
-    assert request_model.inputs[0].text == "Text to be classified"
-    assert request_model.inputs[1].text == "Another text to be classified"
+class TestRequestModel(unittest.TestCase):
+    def test_valid_request_with_text_inputs(self):
+        data = {
+            "inputs": [
+                {"text": "First text"},
+                {"text": "Second text"}
+            ],
+            "data_type": "TEXT",
+            "parameters": {}
+        }
+        request = RequestModel(**data)
+        self.assertEqual(request.data_type, "TEXT")
+        self.assertEqual(len(request.inputs), 2)
+        self.assertIsInstance(request.inputs[0], TextInput)
+        self.assertEqual(request.inputs[0].text, "First text")
+
+    def test_valid_request_with_file_inputs(self):
+        data = {
+            "inputs": [
+                {"file_path": "/path/to/file1.txt"},
+                {"file_path": "/path/to/file2.txt"}
+            ],
+            "data_type": "IMAGE",
+            "parameters": {}
+        }
+        request = RequestModel(**data)
+        self.assertEqual(request.data_type, "IMAGE")
+        self.assertEqual(len(request.inputs), 2)
+        self.assertIsInstance(request.inputs[0], FileInput)
+        self.assertEqual(request.inputs[0].file_path, "/path/to/file1.txt")
+
+    def test_invalid_request_with_mismatched_data_type_and_text_input(self):
+        data = {
+            "inputs": [
+                {"text": "Some text input"}
+            ],
+            "data_type": "IMAGE",
+            "parameters": {}
+        }
+        with self.assertRaises(ValidationError):
+            RequestModel(**data)
+
+    def test_invalid_request_with_mismatched_data_type_and_file_input(self):
+        data = {
+            "inputs": [
+                {"file_path": "/path/to/file.txt"}
+            ],
+            "data_type": "TEXT",
+            "parameters": {}
+        }
+        with self.assertRaises(ValidationError):
+            RequestModel(**data)
+
+    def test_invalid_request_with_invalid_data_type(self):
+        data = {
+            "inputs": [
+                {"file_path": "/path/to/file.txt"}
+            ],
+            "data_type": "INVALID_TYPE",
+            "parameters": {}
+        }
+        with self.assertRaises(ValidationError):
+            RequestModel(**data)
+
+    def test_valid_request_with_complex_parameters(self):
+        data = {
+            "inputs": [
+                {"file_path": "/path/to/file1.txt"},
+                {"file_path": "/path/to/file2.txt"}
+            ],
+            "data_type": "IMAGE",
+            "parameters": {"threshold": 0.8, "option": [1, 2, 3]}
+        }
+        request = RequestModel(**data)
+        self.assertEqual(request.parameters, {"threshold": 0.8, "option": [1, 2, 3]})
+
+    # New test case to handle invalid input in a mixed input list
+    def test_invalid_mixed_inputs(self):
+        data = {
+            "inputs": [
+                {"file_path": "/path/to/audio"},  # valid
+                {"fp": "/path/to/audio2"}         # invalid, missing 'file_path'
+            ],
+            "data_type": "AUDIO",
+            "parameters": {}
+        }
+        with self.assertRaises(ValidationError) as exc_info:
+            RequestModel(**data)
+        self.assertIn("All inputs must contain 'file_path' when data_type is AUDIO", str(exc_info.exception))
 
 
-def test_request_model_with_file_inputs():
-    json_data = {
-        "inputs": [{"file_path": "/path/to/file1"}, {"file_path": "/path/to/file2"}],
-        "data_type": "IMAGE",
-        "parameters": {},
-    }
-    request_model = RequestModel(**json_data)
-    assert request_model.data_type == "IMAGE"
-    assert len(request_model.inputs) == 2
-    assert request_model.inputs[0].file_path == "/path/to/file1"
-    assert request_model.inputs[1].file_path == "/path/to/file2"
-
-
-def test_request_model_with_video_inputs():
-    json_data = {
-        "inputs": [{"file_path": "/path/to/video1"}, {"file_path": "/path/to/video2"}],
-        "data_type": "VIDEO",
-        "parameters": {},
-    }
-    request_model = RequestModel(**json_data)
-    assert request_model.data_type == "VIDEO"
-    assert len(request_model.inputs) == 2
-    assert request_model.inputs[0].file_path == "/path/to/video1"
-    assert request_model.inputs[1].file_path == "/path/to/video2"
-
-
-def test_request_model_with_audio_inputs():
-    json_data = {
-        "inputs": [{"file_path": "/path/to/audio1"}, {"file_path": "/path/to/audio2"}],
-        "data_type": "AUDIO",
-        "parameters": {},
-    }
-    request_model = RequestModel(**json_data)
-    assert request_model.data_type == "AUDIO"
-    assert len(request_model.inputs) == 2
-    assert request_model.inputs[0].file_path == "/path/to/audio1"
-    assert request_model.inputs[1].file_path == "/path/to/audio2"
-
-
-def test_request_model_invalid_data_type():
-    json_data = {
-        "inputs": [{"text": "Text to be classified"}],
-        "data_type": "INVALID",
-        "parameters": {},
-    }
-    with pytest.raises(ValidationError) as exc_info:
-        RequestModel(**json_data)
-    assert "data_type must be one of TEXT, IMAGE, VIDEO, or AUDIO" in str(
-        exc_info.value
-    )
-
-
-def test_request_model_mismatched_inputs_and_data_type():
-    json_data = {
-        "inputs": [{"file_path": "/path/to/file"}],
-        "data_type": "TEXT",
-        "parameters": {},
-    }
-    with pytest.raises(ValidationError) as exc_info:
-        RequestModel(**json_data)
-    assert "All inputs must contain 'text' when data_type is TEXT" in str(
-        exc_info.value
-    )
-
-    json_data = {
-        "inputs": [{"text": "Text to be classified"}],
-        "data_type": "IMAGE",
-        "parameters": {},
-    }
-    with pytest.raises(ValidationError) as exc_info:
-        RequestModel(**json_data)
-    assert "All inputs must contain 'file_path' when data_type is IMAGE" in str(
-        exc_info.value
-    )
-
-    json_data = {
-        "inputs": [{"file_path": "/path/to/video"}, {"text": "Text to be classified"}],
-        "data_type": "VIDEO",
-        "parameters": {},
-    }
-    with pytest.raises(ValidationError) as exc_info:
-        RequestModel(**json_data)
-    assert "All inputs must contain 'file_path' when data_type is VIDEO" in str(
-        exc_info.value
-    )
-
-    json_data = {
-        "inputs": [{"file_path": "/path/to/audio"}, {"fp": "/path/to/audio2"}],
-        "data_type": "AUDIO",
-        "parameters": {},
-    }
-    with pytest.raises(ValidationError) as exc_info:
-        RequestModel(**json_data)
-    assert "All inputs must contain 'file_path' when data_type is AUDIO" in str(
-        exc_info.value
-    )
+if __name__ == "__main__":
+    unittest.main()
