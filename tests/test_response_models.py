@@ -93,10 +93,10 @@ class TestResponseModel(unittest.TestCase):
         self.assertIsInstance(response.results[0], FileResult)
         self.assertIsInstance(response.results[1], TextResult)
 
-    def test_invalid_response_with_missing_status(self):
+    def test_valid_response_with_missing_status(self):
         data = {"results": [{"file_name": "file1.txt", "result": "output_file1.txt"}]}
-        with self.assertRaises(ValidationError):
-            ResponseModel(**data)
+        response = ResponseModel(**data)
+        self.assertEqual(response.status, "SUCCESS")
 
     def test_invalid_response_with_invalid_result_structure(self):
         data = {
@@ -105,6 +105,13 @@ class TestResponseModel(unittest.TestCase):
                 {"file_name": "file1.txt"},
                 {"text": "This is the second text"},
             ],
+        }
+        with self.assertRaises(ValidationError):
+            ResponseModel(**data)
+
+    def test_invalid_response_with_missing_results(self):
+        data = {
+            "status": "success",
         }
         with self.assertRaises(ValidationError):
             ResponseModel(**data)
