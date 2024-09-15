@@ -67,6 +67,20 @@ class TestRequestModel(unittest.TestCase):
         self.assertEqual(len(request.inputs), 2)
         self.assertIsInstance(request.inputs[0], FileInput)
         self.assertEqual(request.inputs[0].file_path, "/path/to/file1.txt")
+    
+    def test_parameters_are_optional(self):
+        data = {
+            "inputs": [
+                {"file_path": "/path/to/file1.txt"},
+                {"file_path": "/path/to/file2.txt"}
+            ],
+            "data_type": "IMAGE"
+        }
+        request = RequestModel(**data)
+        self.assertEqual(request.data_type, "IMAGE")
+        self.assertEqual(len(request.inputs), 2)
+        self.assertIsInstance(request.inputs[0], FileInput)
+        self.assertEqual(request.inputs[0].file_path, "/path/to/file1.txt")
 
     def test_invalid_request_with_mismatched_data_type_and_text_input(self):
         data = {
