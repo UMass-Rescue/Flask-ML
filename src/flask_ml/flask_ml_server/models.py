@@ -1,5 +1,7 @@
+from typing import Any, Dict, List, Union
+
+from flask import Response
 from pydantic import BaseModel, Field, field_validator, model_validator
-from typing import List, Union, Dict, Any
 
 
 class TextInput(BaseModel):
@@ -46,15 +48,42 @@ class RequestModel(BaseModel):
 
 
 class FileResult(BaseModel):
-    file_path: str = Field(..., description="Path of the file associated with the result")
-    result: Any = Field(..., description="The result, which can be any JSON-serializable object")
+    file_path: str = Field(
+        ..., description="Path of the file associated with the result"
+    )
+    result: Any = Field(
+        ..., description="The result, which can be any JSON-serializable object"
+    )
+
+
+class ImageResult(FileResult):
+    pass
+
+
+class VideoResult(FileResult):
+    pass
+
+
+class AudioResult(FileResult):
+    pass
 
 
 class TextResult(BaseModel):
     text: str = Field(..., description="The text content associated with the result")
-    result: Any = Field(..., description="The result, which can be any JSON-serializable object")
+    result: Any = Field(
+        ..., description="The result, which can be any JSON-serializable object"
+    )
 
 
 class ResponseModel(BaseModel):
     status: str = Field(..., description="The status of the operation, e.g., 'success'")
-    results: List[Union[FileResult, TextResult]] = Field(..., description="List of results, each either a file or text with its result")
+    results: List[Union[FileResult, TextResult]] = Field(
+        ..., description="List of results, each either a file or text with its result"
+    )
+
+    def get_response(self, status_code: int = 200):
+        return Response(
+            response=self.json(),
+            status=status_code,
+            mimetype="application/json",
+        )
