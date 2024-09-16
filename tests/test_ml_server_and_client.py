@@ -110,6 +110,12 @@ def client():
     return MLClient("http://127.0.0.1:5000/predict")
 
 
+def test_set_url(client):
+    new_url = "http://localhost:8000/sentimentanalysis"
+    client.set_url(new_url)
+    assert client.url == new_url
+
+
 def test_valid_text_request(app):
     data = {"inputs": [{"text": "Sample text"}], "data_type": "TEXT", "parameters": {}}
 
