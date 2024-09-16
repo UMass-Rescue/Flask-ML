@@ -1,5 +1,9 @@
 import requests
-from flask_ml.flask_ml_server.models import RequestModel, ResponseModel, ErrorResponseModel
+from flask_ml.flask_ml_server.models import (
+    RequestModel,
+    ResponseModel,
+    ErrorResponseModel,
+)
 
 UNKNOWN_ERROR = "Unknown error. Please refer to the status field."
 
@@ -17,6 +21,13 @@ class MLClient:
         """
         self.url = url
 
+    def set_url(self, url: str):
+        """
+        Sets the URL of the server.
+        url : str - the URL of the server
+        """
+        self.url = url
+
     def request(
         self, inputs: list[dict], data_type: str, parameters: dict = {}
     ) -> list[dict]:
@@ -26,13 +37,18 @@ class MLClient:
         data_type : str - the type of the input data
         parameters : dict - the parameters to be sent to the server
         """
-        request_model = RequestModel(inputs=inputs, data_type=data_type, parameters=parameters)
+        request_model = RequestModel(
+            inputs=inputs, data_type=data_type, parameters=parameters
+        )
         response = requests.post(
             self.url,
             json=request_model.model_dump(),
         )
         if "application/json" not in response.headers.get("Content-Type", ""):
-            return ErrorResponseModel(status=f"Unknown error. status_code={str(response.status_code)}", errors=[{"msg": UNKNOWN_ERROR}]).dict()
+            return ErrorResponseModel(
+                status=f"Unknown error. status_code={str(response.status_code)}",
+                errors=[{"msg": UNKNOWN_ERROR}],
+            ).dict()
         if response.status_code != 200:
             return ErrorResponseModel(**response.json()).model_dump()
         response_model = ResponseModel(**response.json())
