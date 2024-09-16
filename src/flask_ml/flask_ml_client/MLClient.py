@@ -1,9 +1,7 @@
 import requests
-from flask_ml.flask_ml_server.models import (
-    RequestModel,
-    ResponseModel,
-    ErrorResponseModel,
-)
+
+from flask_ml.flask_ml_server.models import (ErrorResponseModel, RequestModel,
+                                             ResponseModel)
 
 UNKNOWN_ERROR = "Unknown error. Please refer to the status field."
 

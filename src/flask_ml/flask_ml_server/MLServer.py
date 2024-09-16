@@ -1,7 +1,7 @@
 from flask import Flask, request
 from pydantic import ValidationError
 
-from .models import RequestModel, ErrorResponseModel
+from .models import ErrorResponseModel, RequestModel
 
 
 class MLServer(object):

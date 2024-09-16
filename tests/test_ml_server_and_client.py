@@ -1,15 +1,12 @@
-import pytest
-from flask_ml.flask_ml_server import MLServer
-from flask_ml.flask_ml_client import MLClient
-from flask_ml.flask_ml_server.models import (
-    ResponseModel,
-    TextResult,
-    ImageResult,
-    VideoResult,
-    AudioResult,
-    RequestModel,
-)
 from unittest.mock import patch
+
+import pytest
+
+from flask_ml.flask_ml_client import MLClient
+from flask_ml.flask_ml_server import MLServer
+from flask_ml.flask_ml_server.models import (AudioResult, ImageResult,
+                                             RequestModel, ResponseModel,
+                                             TextResult, VideoResult)
 
 
 def test_invalid_route_parameters():
