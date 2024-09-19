@@ -44,6 +44,8 @@ def mock_post_request(url, json=None, **kwargs):
         return MockResponse(process_video(data.inputs, data.parameters))
     elif url == "http://127.0.0.1:5000/process_audio":
         return MockResponse(process_audio(data.inputs, data.parameters))
+    elif url == "http://127.0.0.1:5000/process_custom_input":
+        return MockResponse(process_custom_input(data.inputs, data.parameters))
 
 
 def process_text(inputs, parameters):
@@ -79,6 +81,16 @@ def process_audio(inputs, parameters):
     return response_model.get_response()
 
 
+def process_custom_input(inputs, parameters):
+    # inputs is a list of models.CustomInput.
+    # CustomInput has only one field called 'input'. It can be of any type.
+    # Let's say our model expects "input" to contain two keys "text" and "file_path".
+    results = [TextResult(text=custom_input_data.input["text"], result=custom_input_data.input["text"] + custom_input_data.input["file_path"])
+               for custom_input_data in inputs]
+    response_model = ResponseModel(status="success", results=results)
+    return response_model.get_response()
+
+
 @pytest.fixture
 def app():
     server = MLServer(__name__)
@@ -98,6 +110,10 @@ def app():
     @server.route("/process_audio", "AUDIO")
     def server_process_audio(inputs, parameters):
         return process_audio(inputs, parameters)
+    
+    @server.route("/process_custom_input", "CUSTOM")
+    def server_process_custom_input(inputs, parameters):
+        return process_custom_input(inputs, parameters)
 
     return server.app.test_client()
 
@@ -143,7 +159,6 @@ def test_invalid_text_request(app):
         "parameters": {},
     }
     response = app.post("/process_text", json=data)
-    # {'status': 'VALIDATION_ERROR', 'errors': [{'type': 'value_error', 'input': {'inputs': [{'file_path': 'Text to be classified'}, {'file_path': 'Another text to be classified'}], 'data_type': 'TEXT', 'parameters': {}}, 'msg': "Value error, All inputs must contain 'text' when data_type is TEXT"}], 'status_code': 400}
     assert response.status_code == 400
     assert "VALIDATION_ERROR" == response.json["status"]
     assert "value_error" == response.json["errors"][0]["type"]
@@ -269,5 +284,43 @@ def test_invalid_audio_request(app):
     assert "value_error" == response.json["errors"][0]["type"]
     assert (
         "Value error, All inputs must contain 'file_path' when data_type is AUDIO"
+        == response.json["errors"][0]["msg"]
+    )
+
+
+def test_valid_custom_input_request(app):
+    data = {
+        "inputs": [
+            {"input": {"text": "Sample text", "file_path": "/path/to/file.txt"}},
+            {"input": {"text": "Another text", "file_path": "/path/to/another_file.txt"}},
+        ],
+        "data_type": "CUSTOM",
+        "parameters": {},
+    }
+
+    response = app.post("/process_custom_input", json=data)
+    assert response.status_code == 200
+    assert response.json == {
+        "status": "success",
+        "results": [
+            {"text": "Sample text", "result": "Sample text/path/to/file.txt"},
+            {"text": "Another text", "result": "Another text/path/to/another_file.txt"},
+        ],
+    }
+
+
+def test_invalid_custom_input_request(app):
+    data = {
+        "inputs": [{"text": "/path/to/file"}],
+        "data_type": "CUSTOM",
+        "parameters": {},
+    }
+    response = app.post("/process_custom_input", json=data)
+
+    assert response.status_code == 400
+    assert "VALIDATION_ERROR" == response.json["status"]
+    assert "value_error" == response.json["errors"][0]["type"]
+    assert (
+        "Value error, All inputs must contain 'input' when data_type is CUSTOM"
         == response.json["errors"][0]["msg"]
     )
