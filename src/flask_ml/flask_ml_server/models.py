@@ -74,6 +74,11 @@ class RequestModel(BaseModel):
                 raise ValueError(
                     f"All inputs must contain 'file_path' when data_type is {data_type}"
                 )
+        elif data_type == "CUSTOM":
+            if not all("input" in item for item in inputs):
+                raise ValueError(
+                    "All inputs must contain 'input' when data_type is CUSTOM"
+                )
         return values
 
 
