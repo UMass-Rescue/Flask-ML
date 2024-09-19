@@ -18,6 +18,10 @@ class FileInput(MLInput):
     )
 
 
+class CustomInput(MLInput):
+    input: Any = Field(..., description="Custom input")
+
+
 class RequestModel(BaseModel):
     """
     Represents a request model for processing inputs with an ML model.
@@ -33,14 +37,14 @@ class RequestModel(BaseModel):
         ValueError: If the inputs do not match the data_type.
     """
 
-    inputs: List[Union[TextInput, FileInput]] = Field(
+    inputs: List[Union[TextInput, FileInput, CustomInput]] = Field(
         ...,
         description="List of input items to be processed",
         min_length=1,
     )
     data_type: str = Field(
         ...,
-        description="Type of the data, should be TEXT, IMAGE, VIDEO, or AUDIO",
+        description="Type of the data, should be TEXT, IMAGE, VIDEO, AUDIO, or CUSTOM",
         min_length=1,
     )
     parameters: Dict = Field(
@@ -49,8 +53,10 @@ class RequestModel(BaseModel):
 
     @field_validator("data_type", mode="before")
     def check_data_type(cls, v):
-        if v not in {"TEXT", "IMAGE", "VIDEO", "AUDIO"}:
-            raise ValueError("data_type must be one of TEXT, IMAGE, VIDEO, or AUDIO")
+        if v not in {"TEXT", "IMAGE", "VIDEO", "AUDIO", "CUSTOM"}:
+            raise ValueError(
+                "data_type must be one of TEXT, IMAGE, VIDEO, AUDIO, or CUSTOM"
+            )
         return v
 
     @model_validator(mode="before")
@@ -63,7 +69,7 @@ class RequestModel(BaseModel):
                 raise ValueError(
                     "All inputs must contain 'text' when data_type is TEXT"
                 )
-        else:
+        elif data_type in ["IMAGE", "VIDEO", "AUDIO"]:
             if not all(isinstance(item.get("file_path"), str) for item in inputs):
                 raise ValueError(
                     f"All inputs must contain 'file_path' when data_type is {data_type}"
