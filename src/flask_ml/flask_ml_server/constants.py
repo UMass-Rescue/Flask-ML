@@ -7,3 +7,4 @@ class DataTypes:
     VIDEO = "VIDEO"
     AUDIO = "AUDIO"
     TEXT = "TEXT"
+    CUSTOM = "CUSTOM"  # For inputs that don't fit any of the standard types
