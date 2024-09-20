@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "flask_ml"
-version = "0.0.8"
+version = "0.0.9"
 authors = [
   { name="Prasanna Lakkur Subramanyam", email="psubramanyam@umass.edu" },
 ]
@@ -34,11 +34,6 @@ dev = [
     "types-requests",
     "pytest"
 ]
-
-[tool.setuptools.package-data]
-"flask_ml" = ["py.typed"]
-[tool.setuptools.packages.find]
-where = ["src"]
 
 [project.urls]
 Homepage = "https://github.com/UMass-Rescue/Flask-ML"
