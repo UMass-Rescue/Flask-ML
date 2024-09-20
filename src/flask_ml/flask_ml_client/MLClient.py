@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Union
 
 import requests
 
@@ -30,7 +30,7 @@ class MLClient:
 
     def request(
         self, inputs: list[dict], data_type: str, parameters: dict = {}
-    ) -> dict[str, Any] | list[dict]:
+    ) -> Union[dict[str, Any], list[dict]]:
         """
         Sends a request to the server.
         inputs : list - the list of dictionaries containing the data to be sent to the server
