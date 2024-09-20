@@ -25,5 +25,20 @@ dependencies = [
     "pydantic"
 ]
 
+[project.optional-dependencies]
+dev = [
+    "black",
+    "isort",
+    "flake8",
+    "mypy",
+    "types-requests",
+    "pytest"
+]
+
+[tool.setuptools.package-data]
+"flask_ml" = ["py.typed"]
+[tool.setuptools.packages.find]
+where = ["src"]
+
 [project.urls]
 Homepage = "https://github.com/UMass-Rescue/Flask-ML"

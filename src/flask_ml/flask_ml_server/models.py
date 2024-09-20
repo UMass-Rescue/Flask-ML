@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Sequence, Union
 
 from flask import Response
 from pydantic import BaseModel, Field, field_validator, model_validator
@@ -130,7 +130,7 @@ class ResponseModel(BaseModel):
         description="The status of the operation, e.g., 'SUCCESS'",
         min_length=1,
     )
-    results: List[Union[TextResult, ImageResult, AudioResult, VideoResult]] = Field(
+    results: Sequence[Union[TextResult, ImageResult, AudioResult, VideoResult]] = Field(
         ...,
         description="List of results, each either a file or text with its result",
         min_length=1,
