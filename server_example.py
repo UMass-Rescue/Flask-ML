@@ -1,8 +1,7 @@
 from flask_ml.flask_ml_server import MLServer
 from flask_ml.flask_ml_server.constants import DataTypes
 from flask_ml.flask_ml_server.models import (ImageResult, ResponseModel,
-                                             TextResult)
-
+                                             TextResult, TextInput, FileInput)
 
 # Create a dummy ML model
 class DummyModel:
@@ -11,7 +10,7 @@ class DummyModel:
 
 
 class SentimentModel:
-    def predict(self, data: list[str]) -> list[str]:
+    def predict(self, data: list[TextInput]) -> list[dict]:
         return [
             {"text": t.text, "sentiment": "positive" if i % 2 == 0 else "negative"}
             for i, t in enumerate(data)
@@ -19,7 +18,7 @@ class SentimentModel:
 
 
 class ImageStyleTransferModel:
-    def predict(self, data: list[str]) -> list[str]:
+    def predict(self, data: list[FileInput]) -> list[dict]:
         return [
             {"file_path": f.file_path, "result": f"stylized_image_{i}.jpg"}
             for i, f in enumerate(data)
@@ -37,7 +36,7 @@ server = MLServer(__name__)
 
 # Create an endpoint
 @server.route("/dummymodel", DataTypes.TEXT)
-def process_text(inputs: list, parameters: dict) -> dict:
+def process_text(inputs: list[TextInput], parameters: dict):
     results = model.predict(inputs)
     results = [TextResult(text=e.text, result=r) for e, r in zip(inputs, results)]
     response = ResponseModel(results=results)
@@ -45,7 +44,7 @@ def process_text(inputs: list, parameters: dict) -> dict:
 
 
 @server.route("/randomsentimentanalysis", DataTypes.TEXT)
-def sentiment_analysis(inputs: list, parameters: dict) -> dict:
+def sentiment_analysis(inputs: list[TextInput], parameters: dict):
     results = sentiment_model.predict(inputs)
     results = [TextResult(text=res["text"], result=res["sentiment"]) for res in results]
     response = ResponseModel(results=results)
@@ -53,7 +52,7 @@ def sentiment_analysis(inputs: list, parameters: dict) -> dict:
 
 
 @server.route("/imagestyletransfer", DataTypes.IMAGE)
-def image_style_transfer(inputs: list, parameters: dict) -> dict:
+def image_style_transfer(inputs: list[FileInput], parameters: dict):
     results = image_style_transfer_model.predict(inputs)
     results = [
         ImageResult(file_path=res["file_path"], result=res["result"]) for res in results
