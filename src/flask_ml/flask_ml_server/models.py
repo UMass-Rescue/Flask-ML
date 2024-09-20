@@ -13,9 +13,7 @@ class TextInput(MLInput):
 
 
 class FileInput(MLInput):
-    file_path: str = Field(
-        ..., description="Path of the file to be processed", min_length=1
-    )
+    file_path: str = Field(..., description="Path of the file to be processed", min_length=1)
 
 
 class CustomInput(MLInput):
@@ -47,16 +45,12 @@ class RequestModel(BaseModel):
         description="Type of the data, should be TEXT, IMAGE, VIDEO, AUDIO, or CUSTOM",
         min_length=1,
     )
-    parameters: Dict = Field(
-        default_factory=dict, description="Additional parameters for the ML model"
-    )
+    parameters: Dict = Field(default_factory=dict, description="Additional parameters for the ML model")
 
     @field_validator("data_type", mode="before")
     def check_data_type(cls, v):
         if v not in {"TEXT", "IMAGE", "VIDEO", "AUDIO", "CUSTOM"}:
-            raise ValueError(
-                "data_type must be one of TEXT, IMAGE, VIDEO, AUDIO, or CUSTOM"
-            )
+            raise ValueError("data_type must be one of TEXT, IMAGE, VIDEO, AUDIO, or CUSTOM")
         return v
 
     @model_validator(mode="before")
@@ -66,19 +60,13 @@ class RequestModel(BaseModel):
 
         if data_type == "TEXT":
             if not all(isinstance(item.get("text"), str) for item in inputs):
-                raise ValueError(
-                    "All inputs must contain 'text' when data_type is TEXT"
-                )
+                raise ValueError("All inputs must contain 'text' when data_type is TEXT")
         elif data_type in ["IMAGE", "VIDEO", "AUDIO"]:
             if not all(isinstance(item.get("file_path"), str) for item in inputs):
-                raise ValueError(
-                    f"All inputs must contain 'file_path' when data_type is {data_type}"
-                )
+                raise ValueError(f"All inputs must contain 'file_path' when data_type is {data_type}")
         elif data_type == "CUSTOM":
             if not all("input" in item for item in inputs):
-                raise ValueError(
-                    "All inputs must contain 'input' when data_type is CUSTOM"
-                )
+                raise ValueError("All inputs must contain 'input' when data_type is CUSTOM")
         return values
 
 
@@ -91,9 +79,7 @@ class MLResult(BaseModel):
 
 
 class FileResult(MLResult):
-    file_path: str = Field(
-        ..., description="Path of the file associated with the result", min_length=1
-    )
+    file_path: str = Field(..., description="Path of the file associated with the result", min_length=1)
 
 
 class ImageResult(FileResult):
@@ -109,9 +95,7 @@ class AudioResult(FileResult):
 
 
 class TextResult(MLResult):
-    text: str = Field(
-        ..., description="The text content associated with the result", min_length=1
-    )
+    text: str = Field(..., description="The text content associated with the result", min_length=1)
 
 
 class ResponseModel(BaseModel):

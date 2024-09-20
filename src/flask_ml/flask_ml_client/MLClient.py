@@ -2,8 +2,11 @@ from typing import Any, Union
 
 import requests
 
-from flask_ml.flask_ml_server.models import (ErrorResponseModel, RequestModel,
-                                             ResponseModel)
+from flask_ml.flask_ml_server.models import (
+    ErrorResponseModel,
+    RequestModel,
+    ResponseModel,
+)
 
 UNKNOWN_ERROR = "Unknown error. Please refer to the status field."
 
@@ -38,7 +41,7 @@ class MLClient:
         parameters : dict - the parameters to be sent to the server
         """
         request_model = RequestModel(
-            inputs=inputs, data_type=data_type, parameters=parameters # type: ignore
+            inputs=inputs, data_type=data_type, parameters=parameters  # type: ignore
         )
         response = requests.post(
             self.url,

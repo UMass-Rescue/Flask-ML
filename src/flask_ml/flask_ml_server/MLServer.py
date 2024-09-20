@@ -46,9 +46,7 @@ class MLServer(object):
                         }
                         for err in error_details
                     ]
-                    return ErrorResponseModel(
-                        status="VALIDATION_ERROR", errors=error_details
-                    ).get_response()
+                    return ErrorResponseModel(status="VALIDATION_ERROR", errors=error_details).get_response()
 
             return wrapper
 

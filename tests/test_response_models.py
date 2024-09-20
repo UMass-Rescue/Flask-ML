@@ -1,11 +1,15 @@
 import unittest
-from typing import Any
 
 from pydantic import ValidationError
 
-from flask_ml.flask_ml_server.models import (AudioResult, FileResult,
-                                             ImageResult, ResponseModel,
-                                             TextResult, VideoResult)
+from flask_ml.flask_ml_server.models import (
+    AudioResult,
+    FileResult,
+    ImageResult,
+    ResponseModel,
+    TextResult,
+    VideoResult,
+)
 
 
 class TestFileResultModel(unittest.TestCase):

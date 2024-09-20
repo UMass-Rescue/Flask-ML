@@ -1,7 +1,13 @@
 from flask_ml.flask_ml_server import MLServer
 from flask_ml.flask_ml_server.constants import DataTypes
-from flask_ml.flask_ml_server.models import (ImageResult, ResponseModel,
-                                             TextResult, TextInput, FileInput)
+from flask_ml.flask_ml_server.models import (
+    FileInput,
+    ImageResult,
+    ResponseModel,
+    TextInput,
+    TextResult,
+)
+
 
 # Create a dummy ML model
 class DummyModel:
@@ -19,10 +25,7 @@ class SentimentModel:
 
 class ImageStyleTransferModel:
     def predict(self, data: list[FileInput]) -> list[dict]:
-        return [
-            {"file_path": f.file_path, "result": f"stylized_image_{i}.jpg"}
-            for i, f in enumerate(data)
-        ]
+        return [{"file_path": f.file_path, "result": f"stylized_image_{i}.jpg"} for i, f in enumerate(data)]
 
 
 # create an instance of the model
@@ -54,9 +57,7 @@ def sentiment_analysis(inputs: list[TextInput], parameters: dict):
 @server.route("/imagestyletransfer", DataTypes.IMAGE)
 def image_style_transfer(inputs: list[FileInput], parameters: dict):
     results = image_style_transfer_model.predict(inputs)
-    image_results = [
-        ImageResult(file_path=res["file_path"], result=res["result"]) for res in results
-    ]
+    image_results = [ImageResult(file_path=res["file_path"], result=res["result"]) for res in results]
     response = ResponseModel(results=image_results)
     return response.get_response()
 
