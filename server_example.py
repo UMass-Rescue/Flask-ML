@@ -46,18 +46,18 @@ def process_text(inputs: list[TextInput], parameters: dict):
 @server.route("/randomsentimentanalysis", DataTypes.TEXT)
 def sentiment_analysis(inputs: list[TextInput], parameters: dict):
     results = sentiment_model.predict(inputs)
-    results = [TextResult(text=res["text"], result=res["sentiment"]) for res in results]
-    response = ResponseModel(results=results)
+    text_results = [TextResult(text=res["text"], result=res["sentiment"]) for res in results]
+    response = ResponseModel(results=text_results)
     return response.get_response()
 
 
 @server.route("/imagestyletransfer", DataTypes.IMAGE)
 def image_style_transfer(inputs: list[FileInput], parameters: dict):
     results = image_style_transfer_model.predict(inputs)
-    results = [
+    image_results = [
         ImageResult(file_path=res["file_path"], result=res["result"]) for res in results
     ]
-    response = ResponseModel(results=results)
+    response = ResponseModel(results=image_results)
     return response.get_response()
 
 
