@@ -35,10 +35,5 @@ dev = [
     "pytest"
 ]
 
-[tool.setuptools.package-data]
-"flask_ml" = ["py.typed"]
-[tool.setuptools.packages.find]
-where = ["src"]
-
 [project.urls]
 Homepage = "https://github.com/UMass-Rescue/Flask-ML"
