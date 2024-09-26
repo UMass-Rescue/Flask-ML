@@ -41,31 +41,6 @@ This project is a Next.js-based web application that serves as a client for inte
 
 2. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
-## Project Structure
-
-ml-client/
-├── app/
-│ ├── about/
-│ │ └── page.tsx
-│ ├── api/
-│ │ └── ml-proxy/
-│ │ └── route.ts
-│ ├── layout.tsx
-│ └── page.tsx
-├── components/
-│ ├── MLClient.tsx
-│ ├── MLForm.tsx
-│ └── ResultDisplay.tsx
-├── lib/
-│ └── MLServerAPI.ts
-├── styles/
-│ └── globals.css
-├── .env.local
-├── next.config.mjs
-├── postcss.config.mjs
-├── tailwind.config.js
-└── tsconfig.json
-
 ## Extending Abstract Classes
 
 The main abstract class in this project is MLServerAPI in lib/MLServerAPI.ts. To extend or modify this class:
