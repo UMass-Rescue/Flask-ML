@@ -7,8 +7,7 @@ This project is a Next.js-based web application that serves as a client for inte
 1. [Prerequisites](#prerequisites)
 2. [Setup](#setup)
 3. [Running the Application](#running-the-application)
-4. [Project Structure](#project-structure)
-5. [Extending Abstract Classes](#extending-abstract-classes)
+4. [Extending Abstract Classes](#extending-abstract-classes)
 
 ## Prerequisites
 
