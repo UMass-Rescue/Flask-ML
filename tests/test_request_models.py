@@ -3,12 +3,8 @@ import unittest
 from pydantic import ValidationError
 
 from flask_ml.flask_ml_server.constants import DataTypes
-from flask_ml.flask_ml_server.models import (
-    CustomInput,
-    FileInput,
-    RequestModel,
-    TextInput,
-)
+from flask_ml.flask_ml_server.models import (CustomInput, FileInput,
+                                             RequestModel, TextInput)
 
 
 class TestFileInputModel(unittest.TestCase):
@@ -75,7 +71,10 @@ class TestRequestModel(unittest.TestCase):
 
     def test_valid_request_with_custom_inputs(self):
         data = {
-            "inputs": [{"input": ["inp1", {"a": "b"}, 123]}, {"input": {"key": "value"}}],
+            "inputs": [
+                {"input": ["inp1", {"a": "b"}, 123]},
+                {"input": {"key": "value"}},
+            ],
             "data_type": DataTypes.CUSTOM,
             "parameters": {},
         }

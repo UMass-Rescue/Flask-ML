@@ -1,9 +1,11 @@
-from flask import Flask, request, jsonify
-from pydantic import ValidationError, BaseModel
+import inspect
+from typing import get_args, get_origin, get_type_hints
+
+from flask import Flask, jsonify, request
+from pydantic import BaseModel, ValidationError
 
 from .models import ErrorResponseModel, RequestModel
-import inspect
-from typing import get_type_hints, get_origin, get_args
+
 
 def get_first_param_name(func):
     sig = inspect.signature(func)
@@ -12,11 +14,10 @@ def get_first_param_name(func):
         return None
     return next(iter(params)).name
 
+
 def format_schema_output(input_schema, output_schema):
-    return {
-        "inputs": input_schema,
-        "output": output_schema
-    }
+    return {"inputs": input_schema, "output": output_schema}
+
 
 def get_function_schema(fn):
     first_param_name = get_first_param_name(fn)
@@ -30,23 +31,19 @@ def get_function_schema(fn):
             return format_schema_output(None, None)
         inner_type = list_args[0]
         if issubclass(inner_type, BaseModel):
-            input_schema = {
-                "type": "array",
-                "items": inner_type.model_json_schema()
-            }
+            input_schema = {"type": "array", "items": inner_type.model_json_schema()}
         else:
             input_schema = None
     else:
         input_schema = None
 
-    output_model = type_hints.get('return')
+    output_model = type_hints.get("return")
     if output_model and issubclass(output_model, BaseModel):
         output_schema = output_model.model_json_schema()
     else:
         output_schema = None
 
     return format_schema_output(input_schema, output_schema)
-
 
 
 class MLServer(object):
@@ -70,10 +67,14 @@ class MLServer(object):
             """
             routes = []
             for rule in self.app.url_map.iter_rules():
-                schema = None if rule.rule not in self.endpoint2function else get_function_schema(self.endpoint2function[rule.rule])
+                schema = (
+                    None
+                    if rule.rule not in self.endpoint2function
+                    else get_function_schema(self.endpoint2function[rule.rule])
+                )
                 route_info = {
                     "rule": rule.rule,
-                    "methods": list(rule.methods - {'HEAD', 'OPTIONS'}),
+                    "methods": list(rule.methods - {"HEAD", "OPTIONS"}),
                     "schema": schema,
                 }
                 routes.append(route_info)
@@ -93,6 +94,7 @@ class MLServer(object):
 
         def build_route(ml_function):
             self.endpoint2function[rule] = ml_function
+
             @self.app.route(rule, endpoint=ml_function.__name__, methods=["POST"])
             def wrapper():
                 try:
@@ -109,7 +111,9 @@ class MLServer(object):
                         }
                         for err in error_details
                     ]
-                    return ErrorResponseModel(status="VALIDATION_ERROR", errors=error_details).get_response()
+                    return ErrorResponseModel(
+                        status="VALIDATION_ERROR", errors=error_details
+                    ).get_response()
 
             return wrapper
 

@@ -4,14 +4,9 @@ import pytest
 
 from flask_ml.flask_ml_client import MLClient
 from flask_ml.flask_ml_server import MLServer
-from flask_ml.flask_ml_server.models import (
-    AudioResult,
-    ImageResult,
-    RequestModel,
-    ResponseModel,
-    TextResult,
-    VideoResult,
-)
+from flask_ml.flask_ml_server.models import (AudioResult, ImageResult,
+                                             RequestModel, ResponseModel,
+                                             TextResult, VideoResult)
 
 
 def test_invalid_route_parameters():
@@ -23,7 +18,9 @@ def test_invalid_route_parameters():
     with pytest.raises(ValueError, match='The parameter "input_type" cannot be None'):
         server.route("/test", None)
 
-    with pytest.raises(ValueError, match='The parameter "rule" is expected to be a string'):
+    with pytest.raises(
+        ValueError, match='The parameter "rule" is expected to be a string'
+    ):
         server.route(123, "TEXT")
 
 
@@ -58,19 +55,28 @@ def process_text(inputs, parameters):
 
 
 def process_image(inputs, parameters):
-    results = [ImageResult(file_path=inp.file_path, result="processed_image.img") for inp in inputs]
+    results = [
+        ImageResult(file_path=inp.file_path, result="processed_image.img")
+        for inp in inputs
+    ]
     response_model = ResponseModel(status="success", results=results)
     return response_model.get_response()
 
 
 def process_video(inputs, parameters):
-    results = [VideoResult(file_path=inp.file_path, result="processed_video.mp4") for inp in inputs]
+    results = [
+        VideoResult(file_path=inp.file_path, result="processed_video.mp4")
+        for inp in inputs
+    ]
     response_model = ResponseModel(status="success", results=results)
     return response_model.get_response()
 
 
 def process_audio(inputs, parameters):
-    results = [AudioResult(file_path=inp.file_path, result="processed_audio.wav") for inp in inputs]
+    results = [
+        AudioResult(file_path=inp.file_path, result="processed_audio.wav")
+        for inp in inputs
+    ]
     response_model = ResponseModel(status="success", results=results)
     return response_model.get_response()
 
@@ -82,7 +88,8 @@ def process_custom_input(inputs, parameters):
     results = [
         TextResult(
             text=custom_input_data.input["text"],
-            result=custom_input_data.input["text"] + custom_input_data.input["file_path"],
+            result=custom_input_data.input["text"]
+            + custom_input_data.input["file_path"],
         )
         for custom_input_data in inputs
     ]
@@ -164,7 +171,9 @@ def test_valid_text_request(app):
 def test_valid_text_request_client(mock_post, client):
     data = {"inputs": [{"text": "Sample text"}], "data_type": "TEXT", "parameters": {}}
 
-    mock_post.return_value = mock_post_request("http://127.0.0.1:5000/process_text", json=data)
+    mock_post.return_value = mock_post_request(
+        "http://127.0.0.1:5000/process_text", json=data
+    )
     response = client.request(data["inputs"], data["data_type"], data["parameters"])
 
     assert response == [{"result": "processed_text.txt", "text": "Sample text"}]
@@ -197,7 +206,9 @@ def test_valid_image_request(app):
     assert response.status_code == 200
     assert response.json == {
         "status": "success",
-        "results": [{"file_path": "/path/to/image.jpg", "result": "processed_image.img"}],
+        "results": [
+            {"file_path": "/path/to/image.jpg", "result": "processed_image.img"}
+        ],
     }
 
 
@@ -209,10 +220,14 @@ def test_valid_image_request_client(mock_post, client):
         "parameters": {},
     }
 
-    mock_post.return_value = mock_post_request("http://127.0.0.1:5000/process_image", json=data)
+    mock_post.return_value = mock_post_request(
+        "http://127.0.0.1:5000/process_image", json=data
+    )
     response = client.request(data["inputs"], data["data_type"], data["parameters"])
 
-    assert response == [{"result": "processed_image.img", "file_path": "/path/to/image.jpg"}]
+    assert response == [
+        {"result": "processed_image.img", "file_path": "/path/to/image.jpg"}
+    ]
 
 
 def test_invalid_image_request(app):
@@ -243,7 +258,9 @@ def test_valid_video_request(app):
     assert response.status_code == 200
     assert response.json == {
         "status": "success",
-        "results": [{"file_path": "/path/to/video.mp4", "result": "processed_video.mp4"}],
+        "results": [
+            {"file_path": "/path/to/video.mp4", "result": "processed_video.mp4"}
+        ],
     }
 
 
@@ -275,7 +292,9 @@ def test_valid_audio_request(app):
     assert response.status_code == 200
     assert response.json == {
         "status": "success",
-        "results": [{"file_path": "/path/to/audio.wav", "result": "processed_audio.wav"}],
+        "results": [
+            {"file_path": "/path/to/audio.wav", "result": "processed_audio.wav"}
+        ],
     }
 
 
@@ -300,7 +319,12 @@ def test_valid_custom_input_request(app):
     data = {
         "inputs": [
             {"input": {"text": "Sample text", "file_path": "/path/to/file.txt"}},
-            {"input": {"text": "Another text", "file_path": "/path/to/another_file.txt"}},
+            {
+                "input": {
+                    "text": "Another text",
+                    "file_path": "/path/to/another_file.txt",
+                }
+            },
         ],
         "data_type": "CUSTOM",
         "parameters": {},
