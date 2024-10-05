@@ -13,7 +13,9 @@ class TextInput(MLInput):
 
 
 class FileInput(MLInput):
-    file_path: str = Field(..., description="Path of the file to be processed", min_length=1)
+    file_path: str = Field(
+        ..., description="Path of the file to be processed", min_length=1
+    )
 
 
 class CustomInput(MLInput):
@@ -45,12 +47,16 @@ class RequestModel(BaseModel):
         description="Type of the data, should be TEXT, IMAGE, VIDEO, AUDIO, or CUSTOM",
         min_length=1,
     )
-    parameters: Dict = Field(default_factory=dict, description="Additional parameters for the ML model")
+    parameters: Dict = Field(
+        default_factory=dict, description="Additional parameters for the ML model"
+    )
 
     @field_validator("data_type", mode="before")
     def check_data_type(cls, v):
         if v not in {"TEXT", "IMAGE", "VIDEO", "AUDIO", "CUSTOM"}:
-            raise ValueError("data_type must be one of TEXT, IMAGE, VIDEO, AUDIO, or CUSTOM")
+            raise ValueError(
+                "data_type must be one of TEXT, IMAGE, VIDEO, AUDIO, or CUSTOM"
+            )
         return v
 
     @model_validator(mode="before")
@@ -60,26 +66,28 @@ class RequestModel(BaseModel):
 
         if data_type == "TEXT":
             if not all(isinstance(item.get("text"), str) for item in inputs):
-                raise ValueError("All inputs must contain 'text' when data_type is TEXT")
+                raise ValueError(
+                    "All inputs must contain 'text' when data_type is TEXT"
+                )
         elif data_type in ["IMAGE", "VIDEO", "AUDIO"]:
             if not all(isinstance(item.get("file_path"), str) for item in inputs):
-                raise ValueError(f"All inputs must contain 'file_path' when data_type is {data_type}")
+                raise ValueError(
+                    f"All inputs must contain 'file_path' when data_type is {data_type}"
+                )
         elif data_type == "CUSTOM":
             if not all("input" in item for item in inputs):
-                raise ValueError("All inputs must contain 'input' when data_type is CUSTOM")
+                raise ValueError(
+                    "All inputs must contain 'input' when data_type is CUSTOM"
+                )
         return values
 
 
 class MLResult(BaseModel):
-    result: Any = Field(
-        ...,
-        description="The result, which can be any JSON-serializable object",
-        min_length=1,
-    )
+    id: str = Field(..., description="The ID of the result", min_length=1)
 
 
 class FileResult(MLResult):
-    file_path: str = Field(..., description="Path of the file associated with the result", min_length=1)
+    result: str = Field(..., description="Path of the result file.", min_length=1)
 
 
 class ImageResult(FileResult):
@@ -95,10 +103,50 @@ class AudioResult(FileResult):
 
 
 class TextResult(MLResult):
-    text: str = Field(..., description="The text content associated with the result", min_length=1)
+    result: str = Field(..., description="The result text.", min_length=1)
 
 
-class ResponseModel(BaseModel):
+class BatchTextResult(BaseModel):
+    results: List[TextResult] = Field(
+        ..., description="List of text results", min_length=1
+    )
+
+
+class BatchImageResult(BaseModel):
+    results: List[ImageResult] = Field(
+        ..., description="List of image results", min_length=1
+    )
+
+
+class BatchAudioResult(BaseModel):
+    results: List[AudioResult] = Field(
+        ..., description="List of audio results", min_length=1
+    )
+
+
+class BatchVideoResult(BaseModel):
+    results: List[VideoResult] = Field(
+        ..., description="List of video results", min_length=1
+    )
+
+
+class BaseResponseModel(BaseModel):
+    """
+    Base model for response models.
+    Methods:
+        model_dump_json() -> str:
+            Returns the JSON representation of the model.
+    """
+
+    def get_response(self, status_code: int = 200):
+        return Response(
+            response=self.model_dump_json(),
+            status=status_code,
+            mimetype="application/json",
+        )
+
+
+class ResponseModel(BaseResponseModel):
     """
     Model representing the results from an ML model.
     Attributes:
@@ -114,21 +162,15 @@ class ResponseModel(BaseModel):
         description="The status of the operation, e.g., 'SUCCESS'",
         min_length=1,
     )
-    results: Sequence[Union[TextResult, ImageResult, AudioResult, VideoResult]] = Field(
+    results: Union[
+        BatchTextResult, BatchVideoResult, BatchAudioResult, BatchImageResult
+    ] = Field(
         ...,
-        description="List of results, each either a file or text with its result",
-        min_length=1,
+        description="List of results",
     )
 
-    def get_response(self, status_code: int = 200):
-        return Response(
-            response=self.model_dump_json(),
-            status=status_code,
-            mimetype="application/json",
-        )
 
-
-class ErrorResponseModel(BaseModel):
+class ErrorResponseModel(BaseResponseModel):
     """
     Model representing an error response.
     Attributes:
@@ -147,8 +189,4 @@ class ErrorResponseModel(BaseModel):
     errors: List = Field(..., description="Details about the error that occurred")
 
     def get_response(self, status_code: int = 400):
-        return Response(
-            response=self.model_dump_json(),
-            status=status_code,
-            mimetype="application/json",
-        )
+        return super().get_response(status_code)

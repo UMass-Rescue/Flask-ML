@@ -1,17 +1,13 @@
+from typing import List
 from unittest.mock import patch
 
 import pytest
 
 from flask_ml.flask_ml_client import MLClient
 from flask_ml.flask_ml_server import MLServer
-from flask_ml.flask_ml_server.models import (
-    AudioResult,
-    ImageResult,
-    RequestModel,
-    ResponseModel,
-    TextResult,
-    VideoResult,
-)
+from flask_ml.flask_ml_server.models import *
+
+from .constants import *
 
 
 def test_invalid_route_parameters():
@@ -23,7 +19,9 @@ def test_invalid_route_parameters():
     with pytest.raises(ValueError, match='The parameter "input_type" cannot be None'):
         server.route("/test", None)
 
-    with pytest.raises(ValueError, match='The parameter "rule" is expected to be a string'):
+    with pytest.raises(
+        ValueError, match='The parameter "rule" is expected to be a string'
+    ):
         server.route(123, "TEXT")
 
 
@@ -37,42 +35,62 @@ class MockResponse:
         return self.response.get_json()
 
 
+def create_response_model(results):
+    return ResponseModel(status="SUCCESS", results=results).get_response()
+
+
 def mock_post_request(url, json=None, **kwargs):
     data = RequestModel(**json)
     if url == "http://127.0.0.1:5000/process_text":
-        return MockResponse(process_text(data.inputs, data.parameters))
+        return MockResponse(
+            create_response_model(process_text(data.inputs, data.parameters))
+        )
     elif url == "http://127.0.0.1:5000/process_image":
-        return MockResponse(process_image(data.inputs, data.parameters))
+        return MockResponse(
+            create_response_model(process_image(data.inputs, data.parameters))
+        )
     elif url == "http://127.0.0.1:5000/process_video":
-        return MockResponse(process_video(data.inputs, data.parameters))
+        return MockResponse(
+            create_response_model(process_video(data.inputs, data.parameters))
+        )
     elif url == "http://127.0.0.1:5000/process_audio":
-        return MockResponse(process_audio(data.inputs, data.parameters))
+        return MockResponse(
+            create_response_model(process_audio(data.inputs, data.parameters))
+        )
     elif url == "http://127.0.0.1:5000/process_custom_input":
-        return MockResponse(process_custom_input(data.inputs, data.parameters))
+        return MockResponse(
+            create_response_model(process_custom_input(data.inputs, data.parameters))
+        )
 
 
 def process_text(inputs, parameters):
-    results = [TextResult(text=inp.text, result="processed_text.txt") for inp in inputs]
-    response_model = ResponseModel(status="success", results=results)
-    return response_model.get_response()
+    results = [TextResult(id=inp.text, result="processed_text.txt") for inp in inputs]
+    results = BatchTextResult(results=results)
+    return results
 
 
 def process_image(inputs, parameters):
-    results = [ImageResult(file_path=inp.file_path, result="processed_image.img") for inp in inputs]
-    response_model = ResponseModel(status="success", results=results)
-    return response_model.get_response()
+    results = [
+        ImageResult(id=inp.file_path, result="processed_image.img") for inp in inputs
+    ]
+    results = BatchImageResult(results=results)
+    return results
 
 
 def process_video(inputs, parameters):
-    results = [VideoResult(file_path=inp.file_path, result="processed_video.mp4") for inp in inputs]
-    response_model = ResponseModel(status="success", results=results)
-    return response_model.get_response()
+    results = [
+        VideoResult(id=inp.file_path, result="processed_video.mp4") for inp in inputs
+    ]
+    results = BatchVideoResult(results=results)
+    return results
 
 
 def process_audio(inputs, parameters):
-    results = [AudioResult(file_path=inp.file_path, result="processed_audio.wav") for inp in inputs]
-    response_model = ResponseModel(status="success", results=results)
-    return response_model.get_response()
+    results = [
+        AudioResult(id=inp.file_path, result="processed_audio.wav") for inp in inputs
+    ]
+    results = BatchAudioResult(results=results)
+    return results
 
 
 def process_custom_input(inputs, parameters):
@@ -81,13 +99,14 @@ def process_custom_input(inputs, parameters):
     # Let's say our model expects "input" to contain two keys "text" and "file_path".
     results = [
         TextResult(
-            text=custom_input_data.input["text"],
-            result=custom_input_data.input["text"] + custom_input_data.input["file_path"],
+            id=custom_input_data.input["text"],
+            result=custom_input_data.input["text"]
+            + custom_input_data.input["file_path"],
         )
         for custom_input_data in inputs
     ]
-    response_model = ResponseModel(status="success", results=results)
-    return response_model.get_response()
+    results = BatchTextResult(results=results)
+    return results
 
 
 @pytest.fixture
@@ -95,11 +114,11 @@ def app():
     server = MLServer(__name__)
 
     @server.route("/process_text", "TEXT")
-    def server_process_text(inputs, parameters):
+    def server_process_text(inputs: List[TextInput], parameters) -> BatchTextResult:
         return process_text(inputs, parameters)
 
     @server.route("/process_image", "IMAGE")
-    def server_process_image(inputs, parameters):
+    def server_process_image(inputs: List[FileInput], parameters) -> BatchImageResult:
         return process_image(inputs, parameters)
 
     @server.route("/process_video", "VIDEO")
@@ -126,12 +145,38 @@ def test_list_routes(app):
     response = app.get("/api/routes")
     assert response.status_code == 200
     assert response.json == [
-        {"rule": "/api/routes", "methods": ["GET"]},
-        {"rule": "/process_text", "methods": ["POST"]},
-        {"rule": "/process_image", "methods": ["POST"]},
-        {"rule": "/process_video", "methods": ["POST"]},
-        {"rule": "/process_audio", "methods": ["POST"]},
-        {"rule": "/process_custom_input", "methods": ["POST"]},
+        {"rule": "/api/routes", "methods": ["GET"], "schema": None},
+        {
+            "rule": "/process_text",
+            "methods": ["POST"],
+            "schema": {
+                "inputs": TEXT_INPUT_SCHEMA,
+                "output": BATCH_TEXT_RESPONSE_SCHEMA,
+            },
+        },
+        {
+            "rule": "/process_image",
+            "methods": ["POST"],
+            "schema": {
+                "inputs": FILE_INPUT_SCHEMA,
+                "output": BATCH_IMAGE_RESPONSE_SCHEMA,
+            },
+        },
+        {
+            "rule": "/process_video",
+            "methods": ["POST"],
+            "schema": {"inputs": None, "output": None},
+        },
+        {
+            "rule": "/process_audio",
+            "methods": ["POST"],
+            "schema": {"inputs": None, "output": None},
+        },
+        {
+            "rule": "/process_custom_input",
+            "methods": ["POST"],
+            "schema": {"inputs": None, "output": None},
+        },
     ]
 
 
@@ -140,7 +185,9 @@ def test_empty_list_routes():
     app = server.app.test_client()
     response = app.get("/api/routes")
     assert response.status_code == 200
-    assert response.json == [{"rule": "/api/routes", "methods": ["GET"]}]
+    assert response.json == [
+        {"rule": "/api/routes", "methods": ["GET"], "schema": None}
+    ]
 
 
 def test_set_url(client):
@@ -155,8 +202,8 @@ def test_valid_text_request(app):
     response = app.post("/process_text", json=data)
     assert response.status_code == 200
     assert response.json == {
-        "status": "success",
-        "results": [{"text": "Sample text", "result": "processed_text.txt"}],
+        "status": "SUCCESS",
+        "results": {"results": [{"id": "Sample text", "result": "processed_text.txt"}]},
     }
 
 
@@ -164,10 +211,13 @@ def test_valid_text_request(app):
 def test_valid_text_request_client(mock_post, client):
     data = {"inputs": [{"text": "Sample text"}], "data_type": "TEXT", "parameters": {}}
 
-    mock_post.return_value = mock_post_request("http://127.0.0.1:5000/process_text", json=data)
+    mock_post.return_value = mock_post_request(
+        "http://127.0.0.1:5000/process_text", json=data
+    )
     response = client.request(data["inputs"], data["data_type"], data["parameters"])
-
-    assert response == [{"result": "processed_text.txt", "text": "Sample text"}]
+    assert response == {
+        "results": [{"id": "Sample text", "result": "processed_text.txt"}]
+    }
 
 
 def test_invalid_text_request(app):
@@ -196,8 +246,10 @@ def test_valid_image_request(app):
     response = app.post("/process_image", json=data)
     assert response.status_code == 200
     assert response.json == {
-        "status": "success",
-        "results": [{"file_path": "/path/to/image.jpg", "result": "processed_image.img"}],
+        "status": "SUCCESS",
+        "results": {
+            "results": [{"id": "/path/to/image.jpg", "result": "processed_image.img"}]
+        },
     }
 
 
@@ -209,10 +261,14 @@ def test_valid_image_request_client(mock_post, client):
         "parameters": {},
     }
 
-    mock_post.return_value = mock_post_request("http://127.0.0.1:5000/process_image", json=data)
+    mock_post.return_value = mock_post_request(
+        "http://127.0.0.1:5000/process_image", json=data
+    )
     response = client.request(data["inputs"], data["data_type"], data["parameters"])
 
-    assert response == [{"result": "processed_image.img", "file_path": "/path/to/image.jpg"}]
+    assert response == {
+        "results": [{"id": "/path/to/image.jpg", "result": "processed_image.img"}]
+    }
 
 
 def test_invalid_image_request(app):
@@ -242,8 +298,10 @@ def test_valid_video_request(app):
     response = app.post("/process_video", json=data)
     assert response.status_code == 200
     assert response.json == {
-        "status": "success",
-        "results": [{"file_path": "/path/to/video.mp4", "result": "processed_video.mp4"}],
+        "status": "SUCCESS",
+        "results": {
+            "results": [{"id": "/path/to/video.mp4", "result": "processed_video.mp4"}]
+        },
     }
 
 
@@ -274,8 +332,10 @@ def test_valid_audio_request(app):
     response = app.post("/process_audio", json=data)
     assert response.status_code == 200
     assert response.json == {
-        "status": "success",
-        "results": [{"file_path": "/path/to/audio.wav", "result": "processed_audio.wav"}],
+        "status": "SUCCESS",
+        "results": {
+            "results": [{"id": "/path/to/audio.wav", "result": "processed_audio.wav"}]
+        },
     }
 
 
@@ -300,7 +360,12 @@ def test_valid_custom_input_request(app):
     data = {
         "inputs": [
             {"input": {"text": "Sample text", "file_path": "/path/to/file.txt"}},
-            {"input": {"text": "Another text", "file_path": "/path/to/another_file.txt"}},
+            {
+                "input": {
+                    "text": "Another text",
+                    "file_path": "/path/to/another_file.txt",
+                }
+            },
         ],
         "data_type": "CUSTOM",
         "parameters": {},
@@ -309,11 +374,16 @@ def test_valid_custom_input_request(app):
     response = app.post("/process_custom_input", json=data)
     assert response.status_code == 200
     assert response.json == {
-        "status": "success",
-        "results": [
-            {"text": "Sample text", "result": "Sample text/path/to/file.txt"},
-            {"text": "Another text", "result": "Another text/path/to/another_file.txt"},
-        ],
+        "status": "SUCCESS",
+        "results": {
+            "results": [
+                {"id": "Sample text", "result": "Sample text/path/to/file.txt"},
+                {
+                    "id": "Another text",
+                    "result": "Another text/path/to/another_file.txt",
+                },
+            ]
+        },
     }
 
 
