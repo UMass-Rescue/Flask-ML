@@ -122,6 +122,27 @@ def client():
     return MLClient("http://127.0.0.1:5000/predict")
 
 
+def test_list_routes(app):
+    response = app.get("/api/routes")
+    assert response.status_code == 200
+    assert response.json == [
+        {"rule": "/api/routes", "methods": ["GET"]},
+        {"rule": "/process_text", "methods": ["POST"]},
+        {"rule": "/process_image", "methods": ["POST"]},
+        {"rule": "/process_video", "methods": ["POST"]},
+        {"rule": "/process_audio", "methods": ["POST"]},
+        {"rule": "/process_custom_input", "methods": ["POST"]},
+    ]
+
+
+def test_empty_list_routes():
+    server = MLServer(__name__)
+    app = server.app.test_client()
+    response = app.get("/api/routes")
+    assert response.status_code == 200
+    assert response.json == [{"rule": "/api/routes", "methods": ["GET"]}]
+
+
 def test_set_url(client):
     new_url = "http://localhost:8000/sentimentanalysis"
     client.set_url(new_url)

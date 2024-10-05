@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from pydantic import ValidationError
 
 from .models import ErrorResponseModel, RequestModel
@@ -15,7 +15,18 @@ class MLServer(object):
         """
         Instantiates the MLServer object as a wrapper for the Flask app.
         """
-        self.app = Flask(name)
+        self.app = Flask(name, static_folder=None)
+
+        @self.app.route("/api/routes", methods=["GET"])
+        def list_routes():
+            """
+            Lists all the routes/endpoints available in the Flask app.
+            """
+            routes = []
+            for rule in self.app.url_map.iter_rules():
+                route_info = {"rule": rule.rule, "methods": list(rule.methods - {'HEAD', 'OPTIONS'})}
+                routes.append(route_info)
+            return jsonify(routes)
 
     def route(self, rule: str, input_type: str):
         """
