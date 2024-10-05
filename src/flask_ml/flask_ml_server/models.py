@@ -114,7 +114,23 @@ class TextResult(MLResult):
     )
 
 
-class ResponseModel(BaseModel):
+class BaseResponseModel(BaseModel):
+    """
+    Base model for response models.
+    Methods:
+        model_dump_json() -> str:
+            Returns the JSON representation of the model.
+    """
+
+    def get_response(self, status_code: int = 200):
+        return Response(
+            response=self.model_dump_json(),
+            status=status_code,
+            mimetype="application/json",
+        )
+
+
+class ResponseModel(BaseResponseModel):
     """
     Model representing the results from an ML model.
     Attributes:
@@ -136,15 +152,8 @@ class ResponseModel(BaseModel):
         min_length=1,
     )
 
-    def get_response(self, status_code: int = 200):
-        return Response(
-            response=self.model_dump_json(),
-            status=status_code,
-            mimetype="application/json",
-        )
 
-
-class ErrorResponseModel(BaseModel):
+class ErrorResponseModel(BaseResponseModel):
     """
     Model representing an error response.
     Attributes:
@@ -163,8 +172,4 @@ class ErrorResponseModel(BaseModel):
     errors: List = Field(..., description="Details about the error that occurred")
 
     def get_response(self, status_code: int = 400):
-        return Response(
-            response=self.model_dump_json(),
-            status=status_code,
-            mimetype="application/json",
-        )
+        return super().get_response(status_code)
