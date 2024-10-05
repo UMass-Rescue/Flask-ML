@@ -1,8 +1,9 @@
 from flask import Flask, request, jsonify
-from pydantic import ValidationError
+from pydantic import ValidationError, BaseModel
 
 from .models import ErrorResponseModel, RequestModel
-from typing import get_type_hints, List, get_origin, get_args
+import inspect
+from typing import get_type_hints, get_origin, get_args
 
 def get_first_param_name(func):
     sig = inspect.signature(func)
