@@ -1,13 +1,14 @@
 from unittest.mock import patch
 
 import pytest
+from typing import List
 
 from flask_ml.flask_ml_client import MLClient
 from flask_ml.flask_ml_server import MLServer
 from flask_ml.flask_ml_server.models import (AudioResult, ImageResult,
                                              RequestModel, ResponseModel,
-                                             TextResult, VideoResult)
-
+                                             TextResult, VideoResult, TextInput, FileInput)
+from .constants import TEXT_INPUT_SCHEMA, FILE_INPUT_SCHEMA, RESPONSE_MODEL_OUTPUT_SCHEMA
 
 def test_invalid_route_parameters():
     server = MLServer(__name__)
@@ -102,11 +103,11 @@ def app():
     server = MLServer(__name__)
 
     @server.route("/process_text", "TEXT")
-    def server_process_text(inputs, parameters):
+    def server_process_text(inputs: List[TextInput], parameters) -> ResponseModel:
         return process_text(inputs, parameters)
 
     @server.route("/process_image", "IMAGE")
-    def server_process_image(inputs, parameters):
+    def server_process_image(inputs: List[FileInput], parameters) -> ResponseModel:
         return process_image(inputs, parameters)
 
     @server.route("/process_video", "VIDEO")
@@ -133,12 +134,12 @@ def test_list_routes(app):
     response = app.get("/api/routes")
     assert response.status_code == 200
     assert response.json == [
-        {"rule": "/api/routes", "methods": ["GET"]},
-        {"rule": "/process_text", "methods": ["POST"]},
-        {"rule": "/process_image", "methods": ["POST"]},
-        {"rule": "/process_video", "methods": ["POST"]},
-        {"rule": "/process_audio", "methods": ["POST"]},
-        {"rule": "/process_custom_input", "methods": ["POST"]},
+        {"rule": "/api/routes", "methods": ["GET"], "schema": None},
+        {"rule": "/process_text", "methods": ["POST"], "schema": {"inputs": TEXT_INPUT_SCHEMA, "output": RESPONSE_MODEL_OUTPUT_SCHEMA}},
+        {"rule": "/process_image", "methods": ["POST"], "schema": {"inputs": FILE_INPUT_SCHEMA, "output": RESPONSE_MODEL_OUTPUT_SCHEMA}},
+        {"rule": "/process_video", "methods": ["POST"], "schema": {"inputs": None, "output": None}},
+        {"rule": "/process_audio", "methods": ["POST"], "schema": {"inputs": None, "output": None}},
+        {"rule": "/process_custom_input", "methods": ["POST"], "schema": {"inputs": None, "output": None}},
     ]
 
 
@@ -147,7 +148,7 @@ def test_empty_list_routes():
     app = server.app.test_client()
     response = app.get("/api/routes")
     assert response.status_code == 200
-    assert response.json == [{"rule": "/api/routes", "methods": ["GET"]}]
+    assert response.json == [{"rule": "/api/routes", "methods": ["GET"], "schema": None}]
 
 
 def test_set_url(client):
