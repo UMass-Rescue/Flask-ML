@@ -3,12 +3,8 @@ import unittest
 from pydantic import ValidationError
 
 from flask_ml.flask_ml_server.constants import DataTypes
-from flask_ml.flask_ml_server.models import (
-    CustomInput,
-    FileInput,
-    RequestModel,
-    TextInput,
-)
+from flask_ml.flask_ml_server.models import (CustomInput, FileInput,
+                                             RequestModel, TextInput)
 
 
 class TestFileInputModel(unittest.TestCase):

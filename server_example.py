@@ -1,15 +1,11 @@
+from typing import List
+
 from flask_ml.flask_ml_server import MLServer
 from flask_ml.flask_ml_server.constants import DataTypes
-from flask_ml.flask_ml_server.models import (
-    FileInput,
-    ImageResult,
-    ResponseModel,
-    TextInput,
-    TextResult,
-    BatchImageResult,
-    BatchTextResult,
-)
-from typing import List
+from flask_ml.flask_ml_server.models import (BatchImageResult, BatchTextResult,
+                                             FileInput, ImageResult,
+                                             ResponseModel, TextInput,
+                                             TextResult)
 
 
 # Create a dummy ML model

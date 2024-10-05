@@ -2,11 +2,8 @@ from typing import Any, Union
 
 import requests
 
-from flask_ml.flask_ml_server.models import (
-    ErrorResponseModel,
-    RequestModel,
-    ResponseModel,
-)
+from flask_ml.flask_ml_server.models import (ErrorResponseModel, RequestModel,
+                                             ResponseModel)
 
 UNKNOWN_ERROR = "Unknown error. Please refer to the status field."
 

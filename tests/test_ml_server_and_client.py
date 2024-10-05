@@ -1,11 +1,12 @@
+from typing import List
 from unittest.mock import patch
 
 import pytest
-from typing import List
 
 from flask_ml.flask_ml_client import MLClient
 from flask_ml.flask_ml_server import MLServer
 from flask_ml.flask_ml_server.models import *
+
 from .constants import *
 
 
