@@ -6,7 +6,10 @@ from flask_ml.flask_ml_server.models import (
     ResponseModel,
     TextInput,
     TextResult,
+    BatchImageResult,
+    BatchTextResult,
 )
+from typing import List
 
 
 # Create a dummy ML model
@@ -42,31 +45,31 @@ server = MLServer(__name__)
 
 # Create an endpoint
 @server.route("/dummymodel", DataTypes.TEXT)
-def process_text(inputs: list[TextInput], parameters: dict):
+def process_text(inputs: List[TextInput], parameters: dict) -> BatchTextResult:
     results = model.predict(inputs)
-    results = [TextResult(text=e.text, result=r) for e, r in zip(inputs, results)]
-    response = ResponseModel(results=results)
-    return response.get_response()
+    results = [TextResult(id=e.text, result=r) for e, r in zip(inputs, results)]
+    response = BatchTextResult(results=results)
+    return response
 
 
 @server.route("/randomsentimentanalysis", DataTypes.TEXT)
-def sentiment_analysis(inputs: list[TextInput], parameters: dict):
+def sentiment_analysis(inputs: List[TextInput], parameters: dict):
     results = sentiment_model.predict(inputs)
     text_results = [
-        TextResult(text=res["text"], result=res["sentiment"]) for res in results
+        TextResult(id=res["text"], result=res["sentiment"]) for res in results
     ]
-    response = ResponseModel(results=text_results)
-    return response.get_response()
+    response = BatchTextResult(results=text_results)
+    return response
 
 
 @server.route("/imagestyletransfer", DataTypes.IMAGE)
-def image_style_transfer(inputs: list[FileInput], parameters: dict):
+def image_style_transfer(inputs: List[FileInput], parameters: dict) -> BatchImageResult:
     results = image_style_transfer_model.predict(inputs)
     image_results = [
-        ImageResult(file_path=res["file_path"], result=res["result"]) for res in results
+        ImageResult(id=res["file_path"], result=res["result"]) for res in results
     ]
-    response = ResponseModel(results=image_results)
-    return response.get_response()
+    response = BatchImageResult(results=image_results)
+    return response
 
 
 # Run the server (optional. You can also run the server using the command line)
