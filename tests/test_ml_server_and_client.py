@@ -298,9 +298,9 @@ def test_valid_video_request(app):
     assert response.status_code == 200
     assert response.json == {
         "status": "SUCCESS",
-        "results": {"results": [
-            {"id": "/path/to/video.mp4", "result": "processed_video.mp4"}
-        ]},
+        "results": {
+            "results": [{"id": "/path/to/video.mp4", "result": "processed_video.mp4"}]
+        },
     }
 
 
@@ -332,9 +332,9 @@ def test_valid_audio_request(app):
     assert response.status_code == 200
     assert response.json == {
         "status": "SUCCESS",
-        "results": {"results":[
-            {"id": "/path/to/audio.wav", "result": "processed_audio.wav"}
-        ]},
+        "results": {
+            "results": [{"id": "/path/to/audio.wav", "result": "processed_audio.wav"}]
+        },
     }
 
 
@@ -376,9 +376,12 @@ def test_valid_custom_input_request(app):
         "status": "SUCCESS",
         "results": {
             "results": [
-            {"id": "Sample text", "result": "Sample text/path/to/file.txt"},
-            {"id": "Another text", "result": "Another text/path/to/another_file.txt"},
-        ]
+                {"id": "Sample text", "result": "Sample text/path/to/file.txt"},
+                {
+                    "id": "Another text",
+                    "result": "Another text/path/to/another_file.txt",
+                },
+            ]
         },
     }
 

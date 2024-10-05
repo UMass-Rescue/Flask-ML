@@ -162,7 +162,9 @@ class ResponseModel(BaseResponseModel):
         description="The status of the operation, e.g., 'SUCCESS'",
         min_length=1,
     )
-    results: Union[BatchTextResult, BatchVideoResult, BatchAudioResult, BatchImageResult] = Field(
+    results: Union[
+        BatchTextResult, BatchVideoResult, BatchAudioResult, BatchImageResult
+    ] = Field(
         ...,
         description="List of results",
     )
