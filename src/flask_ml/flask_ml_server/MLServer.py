@@ -2,6 +2,50 @@ from flask import Flask, request, jsonify
 from pydantic import ValidationError
 
 from .models import ErrorResponseModel, RequestModel
+from typing import get_type_hints, List, get_origin, get_args
+
+def get_first_param_name(func):
+    sig = inspect.signature(func)
+    params = sig.parameters.values()
+    if len(params) == 0:
+        return None
+    return next(iter(params)).name
+
+def format_schema_output(input_schema, output_schema):
+    return {
+        "inputs": input_schema,
+        "output": output_schema
+    }
+
+def get_function_schema(fn):
+    first_param_name = get_first_param_name(fn)
+    if not first_param_name:
+        return format_schema_output(None, None)
+    type_hints = get_type_hints(fn)
+    input_type = type_hints.get(first_param_name)
+    if get_origin(input_type) is list:
+        list_args = get_args(input_type)
+        if len(list_args) == 0:
+            return format_schema_output(None, None)
+        inner_type = list_args[0]
+        if issubclass(inner_type, BaseModel):
+            input_schema = {
+                "type": "array",
+                "items": inner_type.model_json_schema()
+            }
+        else:
+            input_schema = None
+    else:
+        input_schema = None
+
+    output_model = type_hints.get('return')
+    if output_model and issubclass(output_model, BaseModel):
+        output_schema = output_model.model_json_schema()
+    else:
+        output_schema = None
+
+    return format_schema_output(input_schema, output_schema)
+
 
 
 class MLServer(object):
@@ -16,6 +60,7 @@ class MLServer(object):
         Instantiates the MLServer object as a wrapper for the Flask app.
         """
         self.app = Flask(name, static_folder=None)
+        self.endpoint2function = {}
 
         @self.app.route("/api/routes", methods=["GET"])
         def list_routes():
@@ -24,7 +69,12 @@ class MLServer(object):
             """
             routes = []
             for rule in self.app.url_map.iter_rules():
-                route_info = {"rule": rule.rule, "methods": list(rule.methods - {'HEAD', 'OPTIONS'})}
+                schema = None if rule.rule not in self.endpoint2function else get_function_schema(self.endpoint2function[rule.rule])
+                route_info = {
+                    "rule": rule.rule,
+                    "methods": list(rule.methods - {'HEAD', 'OPTIONS'}),
+                    "schema": schema,
+                }
                 routes.append(route_info)
             return jsonify(routes)
 
@@ -41,6 +91,7 @@ class MLServer(object):
             raise ValueError('The parameter "rule" is expected to be a string')
 
         def build_route(ml_function):
+            self.endpoint2function[rule] = ml_function
             @self.app.route(rule, endpoint=ml_function.__name__, methods=["POST"])
             def wrapper():
                 try:
