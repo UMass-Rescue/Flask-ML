@@ -83,17 +83,11 @@ class RequestModel(BaseModel):
 
 
 class MLResult(BaseModel):
-    result: Any = Field(
-        ...,
-        description="The result, which can be any JSON-serializable object",
-        min_length=1,
-    )
+    id: str = Field(..., description="The ID of the result", min_length=1)
 
 
 class FileResult(MLResult):
-    file_path: str = Field(
-        ..., description="Path of the file associated with the result", min_length=1
-    )
+    result: str = Field(..., description="Path of the result file.", min_length=1)
 
 
 class ImageResult(FileResult):
@@ -109,8 +103,30 @@ class AudioResult(FileResult):
 
 
 class TextResult(MLResult):
-    text: str = Field(
-        ..., description="The text content associated with the result", min_length=1
+    result: str = Field(..., description="The result text.", min_length=1)
+
+
+class BatchTextResult(BaseModel):
+    results: List[TextResult] = Field(
+        ..., description="List of text results", min_length=1
+    )
+
+
+class BatchImageResult(BaseModel):
+    results: List[ImageResult] = Field(
+        ..., description="List of image results", min_length=1
+    )
+
+
+class BatchAudioResult(BaseModel):
+    results: List[AudioResult] = Field(
+        ..., description="List of audio results", min_length=1
+    )
+
+
+class BatchVideoResult(BaseModel):
+    results: List[VideoResult] = Field(
+        ..., description="List of video results", min_length=1
     )
 
 
@@ -146,10 +162,9 @@ class ResponseModel(BaseResponseModel):
         description="The status of the operation, e.g., 'SUCCESS'",
         min_length=1,
     )
-    results: Sequence[Union[TextResult, ImageResult, AudioResult, VideoResult]] = Field(
+    results: Union[BatchTextResult, BatchVideoResult, BatchAudioResult, BatchImageResult] = Field(
         ...,
-        description="List of results, each either a file or text with its result",
-        min_length=1,
+        description="List of results",
     )
 
 

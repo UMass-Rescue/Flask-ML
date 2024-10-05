@@ -4,7 +4,7 @@ from typing import get_args, get_origin, get_type_hints
 from flask import Flask, jsonify, request
 from pydantic import BaseModel, ValidationError
 
-from .models import ErrorResponseModel, RequestModel
+from .models import ErrorResponseModel, RequestModel, ResponseModel
 
 
 def get_first_param_name(func):
@@ -100,7 +100,9 @@ class MLServer(object):
                 try:
                     data = request.get_json()
                     data = RequestModel(**data)
-                    return ml_function(data.inputs, data.parameters)
+                    result = ml_function(data.inputs, data.parameters)
+                    response = ResponseModel(status="SUCCESS", results=result)
+                    return response.get_response()
                 except ValidationError as e:
                     error_details = e.errors()
                     error_details = [

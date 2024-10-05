@@ -37,128 +37,89 @@ TEXT_INPUT_SCHEMA = {
     "type": "array"
 }
 
-RESPONSE_MODEL_OUTPUT_SCHEMA = {
+BATCH_TEXT_RESPONSE_SCHEMA = {
     "$defs": {
-        "AudioResult": {
-        "properties": {
-            "file_path": {
-            "description": "Path of the file associated with the result",
-            "minLength": 1,
-            "title": "File Path",
-            "type": "string"
-            },
-            "result": {
-            "description": "The result, which can be any JSON-serializable object",
-            "minLength": 1,
-            "title": "Result"
-            }
-        },
-        "required": [
-            "result",
-            "file_path"
-        ],
-        "title": "AudioResult",
-        "type": "object"
-        },
-        "ImageResult": {
-        "properties": {
-            "file_path": {
-            "description": "Path of the file associated with the result",
-            "minLength": 1,
-            "title": "File Path",
-            "type": "string"
-            },
-            "result": {
-            "description": "The result, which can be any JSON-serializable object",
-            "minLength": 1,
-            "title": "Result"
-            }
-        },
-        "required": [
-            "result",
-            "file_path"
-        ],
-        "title": "ImageResult",
-        "type": "object"
-        },
         "TextResult": {
         "properties": {
-            "result": {
-            "description": "The result, which can be any JSON-serializable object",
+            "id": {
+            "description": "The ID of the result",
             "minLength": 1,
-            "title": "Result"
+            "title": "Id",
+            "type": "string"
             },
-            "text": {
-            "description": "The text content associated with the result",
+            "result": {
+            "description": "The result text.",
             "minLength": 1,
-            "title": "Text",
+            "title": "Result",
             "type": "string"
             }
         },
         "required": [
-            "result",
-            "text"
+            "id",
+            "result"
         ],
         "title": "TextResult",
         "type": "object"
-        },
-        "VideoResult": {
-        "properties": {
-            "file_path": {
-            "description": "Path of the file associated with the result",
-            "minLength": 1,
-            "title": "File Path",
-            "type": "string"
-            },
-            "result": {
-            "description": "The result, which can be any JSON-serializable object",
-            "minLength": 1,
-            "title": "Result"
-            }
-        },
-        "required": [
-            "result",
-            "file_path"
-        ],
-        "title": "VideoResult",
-        "type": "object"
         }
     },
-    "description": "Model representing the results from an ML model.\nAttributes:\n    status (str): The status of the operation, e.g., 'success'\n    results (List[MLResult]): List of results.\nMethods:\n    get_response(status_code: int = 200) -\u003E Response:\n        Returns a Flask Response object with the JSON representation of the model.",
     "properties": {
         "results": {
-        "description": "List of results, each either a file or text with its result",
+        "description": "List of text results",
         "items": {
-            "anyOf": [
-            {
-                "$ref": "#/$defs/TextResult"
-            },
-            {
-                "$ref": "#/$defs/ImageResult"
-            },
-            {
-                "$ref": "#/$defs/AudioResult"
-            },
-            {
-                "$ref": "#/$defs/VideoResult"
-            }
-            ]
+            "$ref": "#/$defs/TextResult"
         },
         "minItems": 1,
         "title": "Results",
         "type": "array"
-        },
-        "status": {
-        "default": "SUCCESS",
-        "description": "The status of the operation, e.g., 'SUCCESS'",
-        "minLength": 1,
-        "title": "Status",
-        "type": "string"
         }
     },
     "required": [
         "results"
     ],
-    "title": "ResponseModel",
+    "title": "BatchTextResult",
+    "type": "object"
+}
+
+
+BATCH_IMAGE_RESPONSE_SCHEMA = {
+    "$defs": {
+        "ImageResult": {
+        "properties": {
+            "id": {
+            "description": "The ID of the result",
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+            },
+            "result": {
+            "description": "Path of the result file.",
+            "minLength": 1,
+            "title": "Result",
+            "type": "string"
+            }
+        },
+        "required": [
+            "id",
+            "result"
+        ],
+        "title": "ImageResult",
+        "type": "object"
+        }
+    },
+    "properties": {
+        "results": {
+        "description": "List of image results",
+        "items": {
+            "$ref": "#/$defs/ImageResult"
+        },
+        "minItems": 1,
+        "title": "Results",
+        "type": "array"
+        }
+    },
+    "required": [
+        "results"
+    ],
+    "title": "BatchImageResult",
     "type": "object"
 }
