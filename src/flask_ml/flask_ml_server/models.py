@@ -27,10 +27,6 @@ class RequestModel(RequestModelGenerated):
             if not all(isinstance(item.get("text"), str) for item in inputs):
                 raise ValueError("All inputs must contain 'text' when data_type is TEXT")
         elif data_type in [DataTypes.IMAGE.name, DataTypes.VIDEO.name, DataTypes.AUDIO.name]:
-            print(f"{inputs=}")
-            print(f"{(list(item.get("file_path") for item in inputs))=}")
-            print(f"{(list(isinstance(item.get("file_path"), str) for item in inputs))=}")
-            print(f"{(all(isinstance(item.get("file_path"), str) for item in inputs))=}")
             if not all(isinstance(item.get("file_path"), str) for item in inputs):
                 raise ValueError(f"All inputs must contain 'file_path' when data_type is {data_type}")
         elif data_type == DataTypes.CUSTOM.name:
