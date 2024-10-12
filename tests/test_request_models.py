@@ -2,8 +2,7 @@ import unittest
 
 from pydantic import ValidationError
 
-from flask_ml.flask_ml_server.constants import DataTypes
-from flask_ml.flask_ml_server.models import (CustomInput, FileInput,
+from flask_ml.flask_ml_server.models import (CustomInput, DataTypes, FileInput,
                                              RequestModel, TextInput)
 
 
@@ -45,7 +44,7 @@ class TestRequestModel(unittest.TestCase):
     def test_valid_request_with_text_inputs(self):
         data = {
             "inputs": [{"text": "First text"}, {"text": "Second text"}],
-            "data_type": DataTypes.TEXT,
+            "data_type": DataTypes.TEXT.name,
             "parameters": {},
         }
         request = RequestModel(**data)
@@ -60,7 +59,7 @@ class TestRequestModel(unittest.TestCase):
                 {"file_path": "/path/to/file1.txt"},
                 {"file_path": "/path/to/file2.txt"},
             ],
-            "data_type": DataTypes.IMAGE,
+            "data_type": DataTypes.IMAGE.name,
             "parameters": {},
         }
         request = RequestModel(**data)
@@ -75,7 +74,7 @@ class TestRequestModel(unittest.TestCase):
                 {"input": ["inp1", {"a": "b"}, 123]},
                 {"input": {"key": "value"}},
             ],
-            "data_type": DataTypes.CUSTOM,
+            "data_type": DataTypes.CUSTOM.name,
             "parameters": {},
         }
         request = RequestModel(**data)
@@ -91,7 +90,7 @@ class TestRequestModel(unittest.TestCase):
                 {"file_path": "/path/to/file1.txt"},
                 {"file_path": "/path/to/file2.txt"},
             ],
-            "data_type": DataTypes.IMAGE,
+            "data_type": DataTypes.IMAGE.name,
         }
         request = RequestModel(**data)
         self.assertEqual(request.data_type, DataTypes.IMAGE)
@@ -102,7 +101,7 @@ class TestRequestModel(unittest.TestCase):
     def test_invalid_request_with_mismatched_data_type_and_text_input(self):
         data = {
             "inputs": [{"text": "Some text input"}],
-            "data_type": DataTypes.IMAGE,
+            "data_type": DataTypes.IMAGE.name,
             "parameters": {},
         }
         with self.assertRaises(ValidationError):
@@ -111,7 +110,7 @@ class TestRequestModel(unittest.TestCase):
     def test_invalid_request_with_mismatched_data_type_and_file_input(self):
         data = {
             "inputs": [{"file_path": "/path/to/file.txt"}],
-            "data_type": DataTypes.TEXT,
+            "data_type": DataTypes.TEXT.name,
             "parameters": {},
         }
         with self.assertRaises(ValidationError):
@@ -132,7 +131,7 @@ class TestRequestModel(unittest.TestCase):
                 {"file_path": "/path/to/file1.txt"},
                 {"file_path": "/path/to/file2.txt"},
             ],
-            "data_type": DataTypes.IMAGE,
+            "data_type": DataTypes.IMAGE.name,
             "parameters": {"threshold": 0.8, "option": [1, 2, 3]},
         }
         request = RequestModel(**data)
@@ -145,7 +144,7 @@ class TestRequestModel(unittest.TestCase):
                 {"file_path": "/path/to/audio"},  # valid
                 {"fp": "/path/to/audio2"},  # invalid, missing 'file_path'
             ],
-            "data_type": DataTypes.AUDIO,
+            "data_type": DataTypes.AUDIO.name,
             "parameters": {},
         }
         with self.assertRaises(ValidationError) as exc_info:

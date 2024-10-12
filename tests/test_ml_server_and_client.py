@@ -36,7 +36,8 @@ class MockResponse:
 
 
 def create_response_model(results):
-    return ResponseModel(status="SUCCESS", results=results).get_response()
+    model = ResponseModel(status="SUCCESS", results=results)
+    return create_flask_response(model)
 
 
 def mock_post_request(url, json=None, **kwargs):

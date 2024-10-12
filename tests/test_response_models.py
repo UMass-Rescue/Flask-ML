@@ -117,7 +117,7 @@ class TestResponseModel(unittest.TestCase):
                 ]
             ),
         )
-        response = response_model.get_response()
+        response = create_flask_response(response_model)
         assert response.status_code == 200
         assert response.mimetype == "application/json"
         response_data = response.get_json()
@@ -131,7 +131,7 @@ class TestResponseModel(unittest.TestCase):
                 results=[TextResult(result="Processed text", id="Sample text")]
             ),
         )
-        response = response_model.get_response(status_code=201)
+        response = create_flask_response(response_model, status_code=201)
         assert response.status_code == 201
         assert response.mimetype == "application/json"
         response_data = response.get_json()

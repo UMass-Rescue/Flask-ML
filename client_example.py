@@ -1,5 +1,5 @@
 from flask_ml.flask_ml_client import MLClient
-from flask_ml.flask_ml_server.constants import DataTypes
+from flask_ml.flask_ml_server.models import DataTypes
 
 DUMMY_MODEL_URL = "http://127.0.0.1:5000/dummymodel"  # The URL of the server
 SENTIMENT_MODEL_URL = "http://127.0.0.1:5000/randomsentimentanalysis"
