@@ -114,6 +114,7 @@ class MLServer(object):
 
         def build_route(ml_function: Callable[[Any, Any], ResponseBody]):
             ensure_ml_func_parameters_are_typed_dict(ml_function)
+            # TODO: Add validation here to check at first runtime if the schema and the inferred types match
             if input_schema is not None:
                 endpoint = EndpointDetails(
                     rule=rule,

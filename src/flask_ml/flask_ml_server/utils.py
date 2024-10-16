@@ -153,6 +153,7 @@ def schema_get_sample_payload(schema: TaskSchema) -> RequestBody:
 
 
 def resolve_input_sample(input_type: Any) -> Input:
+    # TODO: Add a parameterized test for this function
     if input_type is FileInput:
         return Input(root=FileInput(path="/Users/path/to/file"))
     elif input_type is DirectoryInput:
@@ -224,6 +225,7 @@ def type_hinting_get_sample_payload(hints: Dict[str, Any]) -> RequestBody:
 
 
 def resolve_input_with_data(input_type: Any, data: Dict[str, Any]):
+    # TODO: Add a parameterized test for this function
     if input_type is FileInput:
         return FileInput(**data)
     elif input_type is DirectoryInput:
