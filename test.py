@@ -42,6 +42,7 @@ class SentimentInputs(TypedDict):
 class Parameters(TypedDict): ...
 
 
+# You can try adding input_schema = SENTIMENT_ANALYSIS_INPUT_SCHEMA below to the route decorator, and see how calling /api/routes changes
 @server.route("/randomsentimentanalysis")
 def sentiment_analysis(inputs: SentimentInputs, parameters: Parameters) -> ResponseBody:
     results = sentiment_model.predict(inputs["text_inputs"].texts)
