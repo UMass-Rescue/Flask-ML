@@ -1,223 +1,495 @@
 openapi: 3.0.0
 info:
-  title: Flask ML API
-  version: 0.1.1
+  title: FlaskML
+  version: 1.0.0
   description: API for processing machine learning inputs and returning results.
-paths: {}
+paths:
+  /info:
+    get:
+      summary: Get Info Page
+      responses:
+        '200':
+          description: Info page rendered in markdown
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InfoPage'
+
+  /api/routes:
+    get:
+      summary: Get Available Routes for Tasks
+      responses:
+        '200':
+          description: List of routes for available tasks
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIRoutes'
+
+  /tasks/generate_db/input_schema:
+    get:
+      summary: Get Input Schema for Generating Database
+      responses:
+        '200':
+          description: Input schema for generating database
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskSchema'
+
+  /tasks/generate_db:
+    post:
+      summary: Run Task to Generate Database
+      requestBody:
+        description: Inputs and parameters for generating database
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestBody'
+      responses:
+        '200':
+          description: Task completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseBody'
+
+  /tasks/face_match/input_schema:
+    get:
+      summary: Get Input Schema for Face Matching
+      responses:
+        '200':
+          description: Input schema for face matching
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskSchema'
+
+  /tasks/face_match:
+    post:
+      summary: Run Task to Perform Face Matching
+      requestBody:
+        description: Inputs and parameters for face matching
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestBody'
+      responses:
+        '200':
+          description: Task completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseBody'
 components:
   schemas:
-    MLInput:
+    # Info Page models
+    InfoPage:
       type: object
-      description: Base model for ML input data.
+      required: [info, author, version, lastUpdated]
+      properties:
+        info:
+          type: string
+          description: "Markdown content to render on the info page"
+        author:
+          type: string
+        version:
+          type: string
+        lastUpdated:
+          type: string
+          format: date-time
+      example:
+        info: "# Welcome to the Face Match App\n\nThis app will help you to match faces in your images..."
 
-    TextInput:
-      allOf:
-        - $ref: '#/components/schemas/MLInput'
-        - type: object
-          required: 
-            - text
-          properties:
-            text:
-              type: string
-              description: Text to be processed
-              minLength: 1
+    # API Routes models
+    APIRoutes:
+      type: array
+      items:
+        oneOf:
+          - $ref: "#/components/schemas/SchemaAPIRoute"
+          - $ref: "#/components/schemas/NoSchemaAPIRoute"
+    
+    SchemaAPIRoute:
+      type: object
+      required: [input_schema, run_task, payload_schema, short_title, order]
+      properties:
+        input_schema:
+          type: string
+          example: "/tasks/{name_of_task}/input_schema"
+        run_task:
+          type: string
+          example: "/tasks/{name_of_task}"
+        payload_schema:
+          type: string
+          example: "/tasks/{name_of_task}/payload_schema"
+        sample_payload:
+          type: string
+          example: "/tasks/{name_of_task}/sample_payload"
+        short_title:
+          type: string
+          example: "{A short title for the task}"
+        order:
+          type: integer
+          example: 1
+    
+    NoSchemaAPIRoute:
+      type: object
+      required: [run_task, short_title, order]
+      properties:
+        run_task:
+          type: string
+          example: "/tasks/{name_of_task}"
+        payload_schema:
+          type: string
+          example: "/tasks/{name_of_task}/payload_schema"
+        sample_payload:
+          type: string
+          example: "/tasks/{name_of_task}/sample_payload"
 
+    # Concrete Input Schema Models
+    Input:
+      oneOf:
+        - $ref: "#/components/schemas/FileInput"
+        - $ref: "#/components/schemas/DirectoryInput"
+        - $ref: "#/components/schemas/TextInput"
+        - $ref: "#/components/schemas/BatchFileInput"
+        - $ref: "#/components/schemas/BatchTextInput"
+         
     FileInput:
-      allOf:
-        - $ref: '#/components/schemas/MLInput'
-        - type: object
-          required: 
-            - file_path
-          properties:
-            file_path:
-              type: string
-              description: Path of the file to be processed
-              minLength: 1
-
-    CustomInput:
-      allOf:
-        - $ref: '#/components/schemas/MLInput'
-        - type: object
-          required: 
-            - input
-          properties:
-            input:
-              description: Custom input data
-              default: {}
-              anyOf:
-                - type: string
-                - type: number
-                - type: boolean
-                - type: array
-                - type: object
-
-    RequestModelGenerated:
       type: object
+      required: [path]
+      properties:
+        path:
+          type: string
+    
+    DirectoryInput:
+      type: object
+      required: [path]
+      properties:
+        path:
+          type: string
+    
+    TextInput:
+      type: object
+      required: [text]
+      properties:
+        text:
+          type: string
+    
+    BatchFileInput:
+      type: object
+      required: [files]
+      properties:
+        files:
+          type: array
+          items:
+            $ref: "#/components/schemas/FileInput"
+    
+    BatchTextInput:
+      type: object
+      required: [texts]
+      properties:
+        texts:
+          type: array
+          items:
+            $ref: "#/components/schemas/TextInput"
+
+    # Input Schema Models
+    TaskSchema:
+      type: object
+      required: [inputs, parameters]
       properties:
         inputs:
           type: array
-          description: List of input items to be processed
           items:
-            oneOf:
-              - $ref: '#/components/schemas/TextInput'
-              - $ref: '#/components/schemas/FileInput'
-              - $ref: '#/components/schemas/CustomInput'
-          minLength: 1
-        data_type:
-          $ref: '#/components/schemas/DataTypes'
+            $ref: "#/components/schemas/InputSchema"
+
+        parameters:
+          type: array
+          items:
+            $ref: "#/components/schemas/ParameterSchema"
+    
+    InputSchema:
+      type: object
+      required: [key, label, subtitle, inputType]
+      properties:
+        key:
+          type: string
+        label:
+          type: string
+        subtitle:
+          type: string
+          nullable: true
+          default: ''
+        inputType:
+          $ref: "#/components/schemas/InputType"
+    
+    InputType:
+      type: string
+      enum: ["file", "directory", "text", "textarea", "batchfile", "batchtext"]
+
+    ParameterSchema:
+      type: object
+      required: [key, label, subtitle, value]
+      properties:
+        key:
+          type: string
+        label:
+          type: string
+        subtitle:
+          type: string
+          nullable: true
+          default: ''
+        value:
+          anyOf:
+            - $ref: '#/components/schemas/RangedFloatParameterDescriptor'
+            - $ref: '#/components/schemas/FloatParameterDescriptor'
+            - $ref: '#/components/schemas/EnumParameterDescriptor'
+            - $ref: '#/components/schemas/TextParameterDescriptor'
+            - $ref: '#/components/schemas/RangedIntParameterDescriptor'
+            - $ref: '#/components/schemas/IntParameterDescriptor'
+          
+    ParameterType:
+      type: string
+      enum: ["ranged_float", "float", "enum", "text", "ranged_int", "int"]
+
+    RangedFloatParameterDescriptor:
+      type: object
+      required: [parameterType, range, default]
+      discriminator:
+        propertyName: parameterType
+      properties:
+        parameterType:
+          type: string
+          $ref: "#/components/schemas/ParameterType"
+          default: "ranged_float"
+        range:
+          $ref: "#/components/schemas/FloatRangeDescriptor"
+        default:
+          type: number
+
+    FloatParameterDescriptor:
+      type: object
+      required: [parameterType, default]
+      discriminator:
+        propertyName: parameterType
+      properties:
+        parameterType:
+          type: string
+          $ref: "#/components/schemas/ParameterType"
+          default: "float"
+        default:
+          type: number
+
+    EnumParameterDescriptor:
+      type: object
+      required: [parameterType, enumVals, default]
+      discriminator:
+        propertyName: parameterType
+      properties:
+        parameterType:
+          type: string
+          $ref: "#/components/schemas/ParameterType"
+          default: "enum"
+        enumVals:
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                type: string
+              key:
+                type: string
+        default:
+          type: string
+
+    TextParameterDescriptor:
+      type: object
+      required: [parameterType, default]
+      discriminator:
+        propertyName: parameterType
+      properties:
+        parameterType:
+          type: string
+          $ref: "#/components/schemas/ParameterType"
+          default: "text"
+        default:
+          type: string
+          nullable: true
+
+    RangedIntParameterDescriptor:
+      type: object
+      required: [parameterType, range, default]
+      discriminator:
+        propertyName: parameterType
+      properties:
+        parameterType:
+          type: string
+          $ref: "#/components/schemas/ParameterType"
+          default: "ranged_int"
+        range:
+          $ref: "#/components/schemas/IntRangeDescriptor"
+        default:
+          type: integer
+
+    IntParameterDescriptor:
+      type: object
+      required: [parameterType, default]
+      discriminator:
+        propertyName: parameterType
+      properties:
+        parameterType:
+          type: string
+          $ref: "#/components/schemas/ParameterType"
+          default: "int"
+        default:
+          type: integer
+          nullable: true
+
+    IntRangeDescriptor:
+      type: object
+      required: [min, max]
+      properties:
+        min:
+          type: integer
+        max:
+          type: integer
+    FloatRangeDescriptor:
+      type: object
+      required: [min, max]
+      properties:
+        min:
+          type: number
+        max:
+          type: number
+    
+    # Request Models
+    RequestBody:
+      type: object
+      required: [inputs, parameters]
+      properties:
+        inputs:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/Input"
         parameters:
           type: object
-          description: Additional parameters for the ML model
-          default: {}
-      required:
-        - inputs
-        - data_type
-      description: |
-        Represents a request model for processing inputs with an ML model.
-        - Validates data_type must be one of TEXT, IMAGE, VIDEO, AUDIO, or CUSTOM.
-        - Validates inputs to match the data_type.
 
-    MLResult:
-      type: object
-      required: 
-        - id
-      description: Base model for ML result data.
-      properties:
-        id:
-          type: string
-          description: The ID of the result
-          minLength: 1
-
-    FileResult:
-      allOf:
-        - $ref: '#/components/schemas/MLResult'
-        - type: object
-          required: 
-            - result
-            - file_type
-          properties:
-            result:
-              type: string
-              description: Path of the result file.
-              minLength: 1
-
-    ImageResult:
-      allOf:
-        - $ref: '#/components/schemas/FileResult'
-
-    VideoResult:
-      allOf:
-        - $ref: '#/components/schemas/FileResult'
-
-    AudioResult:
-      allOf:
-        - $ref: '#/components/schemas/FileResult'
-
-    TextResult:
-      allOf:
-        - $ref: '#/components/schemas/MLResult'
-        - type: object
-          required:
-            - result
-          properties:
-            result:
-              type: string
-              description: The result text.
-              minLength: 1
-
-    BatchTextResult:
-      type: object
-      required: 
-        - results
-      properties:
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/TextResult'
-          minLength: 1
-          description: List of text results
-
-    BatchImageResult:
-      type: object
-      required: 
-        - results
-      properties:
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/ImageResult'
-          minLength: 1
-          description: List of image results
-
-    BatchVideoResult:
-      type: object
-      required: 
-        - results
-      properties:
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/VideoResult'
-          minLength: 1
-          description: List of video results
-
-    BatchAudioResult:
-      type: object
-      required: 
-        - results
-      properties:
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/AudioResult'
-          minLength: 1
-          description: List of audio results
-
-    BaseResponseModel:
-      type: object
-      description: Base model for response models.
-      properties: {}
-
-    ResponseModel:
-      allOf:
-        - $ref: '#/components/schemas/BaseResponseModel'
-        - type: object
-          required:
-            - results
-          properties:
-            status:
-              type: string
-              description: The status of the operation, e.g., 'SUCCESS'
-              minLength: 1
-              default: SUCCESS
-            results:
-              oneOf:
-                - $ref: '#/components/schemas/BatchTextResult'
-                - $ref: '#/components/schemas/BatchImageResult'
-                - $ref: '#/components/schemas/BatchVideoResult'
-                - $ref: '#/components/schemas/BatchAudioResult'
-
-    ErrorResponseModel:
-      allOf:
-        - $ref: '#/components/schemas/BaseResponseModel'
-        - type: object
-          required:
-            - status
-            - errors
-          properties:
-            status:
-              type: string
-              description: The status of the operation, e.g., 'ERROR'
-              minLength: 1
-              default: ERROR
-            errors:
-              type: array
-              items:
-                anyOf:
-                  - type: string
-                  - type: object
-              description: Details about the error that occurred
-    DataTypes:
+    # Response Models
+    ResponseBody:
+      oneOf:
+        - $ref: '#/components/schemas/FileResponse'
+        - $ref: '#/components/schemas/DirectoryResponse'
+        - $ref: '#/components/schemas/MarkdownResponse'
+        - $ref: '#/components/schemas/TextResponse'
+        - $ref: '#/components/schemas/BatchFileResponse'
+        - $ref: '#/components/schemas/BatchTextResponse'
+      
+    ResponseType:
       type: string
-      description: Enum for data types
-      enum: ["TEXT", "IMAGE", "VIDEO", "AUDIO", "CUSTOM"]
+      enum: ["file", "directory", "markdown", "text", "batchfile", "batchtext"]
+
+    FileResponse:
+      type: object
+      required: [output_type, file_type, path]
+      discriminator:
+        propertyName: output_type
+      properties:
+        output_type:
+          type: string
+          $ref: "#/components/schemas/ResponseType"
+          default: "file"
+        file_type:
+          type: string
+          enum: ["img", "csv", "json", "text", "audio", "video", "markdown"]
+        path:
+          type: string
+        title:
+          type: string
+        subtitle:
+          type: string
+
+    DirectoryResponse:
+      type: object
+      required: [output_type, path, title, subtitle]
+      discriminator:
+        propertyName: output_type
+      properties:
+        output_type:
+          type: string
+          $ref: "#/components/schemas/ResponseType"
+          default: "directory"
+        path:
+          type: string
+        title:
+          type: string
+        subtitle:
+          type: string
+          nullable: true
+
+    MarkdownResponse:
+      type: object
+      required: [output_type, value]
+      discriminator:
+        propertyName: output_type
+      properties:
+        output_type:
+          type: string
+          $ref: "#/components/schemas/ResponseType"
+          default: "markdown"
+        value:
+          type: string
+        title:
+          type: string
+        subtitle:
+          type: string
+    
+    TextResponse:
+      type: object
+      required: [output_type, value]
+      discriminator:
+        propertyName: output_type
+      properties:
+        output_type:
+          type: string
+          $ref: "#/components/schemas/ResponseType"
+          default: "text"
+        value:
+          type: string
+        title:
+          type: string
+        subtitle:
+          type: string
+
+    
+    BatchFileResponse:
+      type: object
+      required: [output_type, files]
+      discriminator:
+        propertyName: output_type
+      properties:
+        output_type:
+          type: string
+          $ref: "#/components/schemas/ResponseType"
+          default: "batchfile"
+        files:
+          type: array
+          items:
+            $ref: "#/components/schemas/FileResponse"
+    
+    BatchTextResponse:
+      type: object
+      required: [output_type, texts]
+      discriminator:
+        propertyName: output_type
+      properties:
+        output_type:
+          type: string
+          $ref: "#/components/schemas/ResponseType"
+          default: "batchtext"
+        texts:
+          type: array
+          items:
+            $ref: "#/components/schemas/TextResponse"

@@ -1,6 +1,9 @@
 flask_ml_server/ml_server/__pycache__/
 flask_ml_client/ml_client/__pycache__/
 
+# MacOS
+.DS_Store
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

@@ -1,49 +1,63 @@
 import inspect
-from typing import get_args, get_origin, get_type_hints
+import json
+import traceback
+from dataclasses import dataclass
+from logging import getLogger
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    TypedDict,
+    Union,
+    get_args,
+    get_origin,
+    get_type_hints,
+)
 
-from flask import Flask, jsonify, request
+from flask_ml.flask_ml_server.errors import BadRequestError
+
+logger = getLogger(__name__)
+
+from flask import Flask, Response, jsonify, request
 from pydantic import BaseModel, ValidationError
 
-from .models import ErrorResponseModel, RequestModel, ResponseModel, create_flask_response
+from flask_ml.flask_ml_server.models import (
+    APIRoutes,
+    Input,
+    NoSchemaAPIRoute,
+    ResponseBody,
+    SchemaAPIRoute,
+    TaskSchema,
+)
+from flask_ml.flask_ml_server.utils import (
+    ensure_ml_func_parameters_are_typed_dict,
+    no_schema_get_inputs,
+    no_schema_get_parameters,
+    schema_get_inputs,
+    schema_get_parameters,
+    schema_get_sample_payload,
+    type_hinting_get_sample_payload,
+    validate_data_has_keys,
+)
 
 
-def get_first_param_name(func):
-    sig = inspect.signature(func)
-    params = sig.parameters.values()
-    if len(params) == 0:
-        return None
-    return next(iter(params)).name
+@dataclass
+class EndpointDetailsNoSchema:
+    rule: str
+    payload_schema_rule: str
+    sample_payload_rule: str
+    func: Callable[..., ResponseBody]
 
 
-def format_schema_output(input_schema, output_schema):
-    return {"inputs": input_schema, "output": output_schema}
-
-
-def get_function_schema(fn):
-    first_param_name = get_first_param_name(fn)
-    if not first_param_name:
-        return format_schema_output(None, None)
-    type_hints = get_type_hints(fn)
-    input_type = type_hints.get(first_param_name)
-    if get_origin(input_type) is list:
-        list_args = get_args(input_type)
-        if len(list_args) == 0:
-            return format_schema_output(None, None)
-        inner_type = list_args[0]
-        if issubclass(inner_type, BaseModel):
-            input_schema = {"type": "array", "items": inner_type.model_json_schema()}
-        else:
-            input_schema = None
-    else:
-        input_schema = None
-
-    output_model = type_hints.get("return")
-    if output_model and issubclass(output_model, BaseModel):
-        output_schema = output_model.model_json_schema()
-    else:
-        output_schema = None
-
-    return format_schema_output(input_schema, output_schema)
+@dataclass
+class EndpointDetails(EndpointDetailsNoSchema):
+    input_schema_rule: str
+    input_schema: TaskSchema
+    short_title: str
+    order: int
 
 
 class MLServer(object):
@@ -58,67 +72,177 @@ class MLServer(object):
         Instantiates the MLServer object as a wrapper for the Flask app.
         """
         self.app = Flask(name, static_folder=None)
-        self.endpoint2function = {}
+        self.endpoints: List[EndpointDetailsNoSchema] = []
 
         @self.app.route("/api/routes", methods=["GET"])
         def list_routes():
             """
             Lists all the routes/endpoints available in the Flask app.
             """
-            routes = []
-            for rule in self.app.url_map.iter_rules():
-                schema = (
-                    None
-                    if rule.rule not in self.endpoint2function
-                    else get_function_schema(self.endpoint2function[rule.rule])
+            routes = [
+                (
+                    SchemaAPIRoute(
+                        input_schema=endpoint.input_schema_rule,
+                        run_task=endpoint.rule,
+                        sample_payload=endpoint.sample_payload_rule,
+                        payload_schema=endpoint.payload_schema_rule,
+                        short_title=endpoint.short_title,
+                        order=endpoint.order,
+                    )
+                    if isinstance(endpoint, EndpointDetails)
+                    else NoSchemaAPIRoute(
+                        run_task=endpoint.rule,
+                        sample_payload=endpoint.sample_payload_rule,
+                        payload_schema=endpoint.payload_schema_rule,
+                    )
                 )
-                route_info = {
-                    "rule": rule.rule,
-                    "methods": list(rule.methods - {"HEAD", "OPTIONS"}),
-                    "schema": schema,
-                }
-                routes.append(route_info)
-            return jsonify(routes)
+                for endpoint in self.endpoints
+            ]
+            return jsonify(APIRoutes(root=routes).model_dump(mode="json"))
 
-    def route(self, rule: str, input_type: str):
+    def route(
+        self,
+        rule: str,
+        input_schema: Optional[TaskSchema] = None,
+        short_title: Optional[str] = None,
+        order: int = 0,
+    ):
         """
         rule : str - the name of the endpoint
         input_type : str - the type of the input data
         """
-        if rule is None:
-            raise ValueError('The parameter "rule" cannot be None')
-        if input_type is None:
-            raise ValueError('The parameter "input_type" cannot be None')
-        if type(rule) != str:
-            raise ValueError('The parameter "rule" is expected to be a string')
 
-        def build_route(ml_function):
-            self.endpoint2function[rule] = ml_function
+        def build_route(ml_function: Callable[[Any, Any], ResponseBody]):
+            ensure_ml_func_parameters_are_typed_dict(ml_function)
+            if input_schema is not None:
+                endpoint = EndpointDetails(
+                    rule=rule,
+                    input_schema_rule=rule + "/input_schema",
+                    sample_payload_rule=rule + "/sample_payload",
+                    payload_schema_rule=rule + "/payload_schema",
+                    func=ml_function,
+                    input_schema=input_schema,
+                    short_title=short_title or "",
+                    order=order,
+                )
+                self.endpoints.append(endpoint)
 
-            @self.app.route(rule, endpoint=ml_function.__name__, methods=["POST"])
-            def wrapper():
-                try:
-                    data = request.get_json()
-                    data = RequestModel(**data)
-                    result = ml_function(data.inputs, data.parameters)
-                    response = ResponseModel(status="SUCCESS", results=result)
-                    return create_flask_response(response)
-                except ValidationError as e:
-                    error_details = e.errors()
-                    error_details = [
-                        {
-                            "type": err.get("type", ""),
-                            "input": err.get("input", ""),
-                            "msg": err.get("msg", ""),
-                        }
-                        for err in error_details
-                    ]
-                    response_model = ErrorResponseModel(
-                        status="VALIDATION_ERROR", errors=error_details
-                    )
-                    return create_flask_response(response_model, 400)
+                @self.app.route(
+                    endpoint.input_schema_rule, endpoint=endpoint.input_schema_rule, methods=["GET"]
+                )
+                def get_input_schema():
+                    return jsonify(endpoint.input_schema.model_dump(mode="json"))
 
-            return wrapper
+                @self.app.route(
+                    endpoint.sample_payload_rule, endpoint=endpoint.sample_payload_rule, methods=["GET"]
+                )
+                def get_sample_payload():
+                    return jsonify(schema_get_sample_payload(endpoint.input_schema).model_dump(mode="json"))
+
+                @self.app.route(
+                    endpoint.payload_schema_rule, endpoint=endpoint.payload_schema_rule, methods=["GET"]
+                )
+                def get_payload_schema():
+                    return jsonify(schema_get_sample_payload(endpoint.input_schema).model_json_schema())
+
+                @self.app.route(rule, endpoint=ml_function.__name__, methods=["POST"])
+                def wrapper():
+                    try:
+                        data = request.get_json()
+                        validate_data_has_keys(data, ["inputs", "parameters"])
+                        json_inputs = data["inputs"]
+                        json_parameters = data["parameters"]
+
+                        assert input_schema is not None, "FATAL: Input schema cannot be None here"
+
+                        inputs = schema_get_inputs(input_schema, json_inputs)
+                        parameters: Dict[str, Union[str, int, float]] = schema_get_parameters(
+                            input_schema, json_parameters
+                        )
+                        result = ml_function(inputs, parameters)
+                        logger.info(f"200: Successful request")
+                        response = Response(
+                            status=200, mimetype="application/json", response=result.model_dump_json()
+                        )
+                    except ValidationError as e:
+                        error = {"error": e.errors()}
+                        logger.error(f"400: Validation error: {error}")
+                        response = Response(
+                            status=400, mimetype="application/json", response=json.dumps(error)
+                        )
+                    except BadRequestError as e:
+                        logger.error(f"400: Bad request: {e}")
+                        response = Response(
+                            status=400, mimetype="application/json", response=json.dumps({"error": str(e)})
+                        )
+                    except Exception as e:
+                        logger.error(f"500: Internal server error: {repr(e)}")
+                        logger.error(traceback.format_exc())
+                        response = Response(
+                            status=500, mimetype="application/json", response=json.dumps({"error": repr(e)})
+                        )
+                    return response
+
+                return wrapper
+            else:
+                endpoint = EndpointDetailsNoSchema(
+                    rule=rule,
+                    payload_schema_rule=rule + "/payload_schema",
+                    sample_payload_rule=rule + "/sample_payload",
+                    func=ml_function,
+                )
+                self.endpoints.append(endpoint)
+                hints = get_type_hints(ml_function)
+
+                @self.app.route(
+                    endpoint.sample_payload_rule, endpoint=endpoint.sample_payload_rule, methods=["GET"]
+                )
+                def get_sample_payload():
+                    return jsonify(type_hinting_get_sample_payload(hints).model_dump(mode="json"))
+
+                @self.app.route(
+                    endpoint.payload_schema_rule, endpoint=endpoint.payload_schema_rule, methods=["GET"]
+                )
+                def get_payload_schema():
+                    return jsonify(type_hinting_get_sample_payload(hints).model_json_schema())
+
+                @self.app.route(rule, endpoint=ml_function.__name__, methods=["POST"])
+                def wrapper():
+                    try:
+                        data = request.get_json()
+                        validate_data_has_keys(data, ["inputs", "parameters"])
+                        json_inputs = data["inputs"]
+                        json_parameters = data["parameters"]
+
+                        inputs = no_schema_get_inputs(get_type_hints(hints["inputs"]), json_inputs)
+                        parameters: Dict[str, Union[str, int, float]] = no_schema_get_parameters(
+                            get_type_hints(hints["parameters"]), json_parameters
+                        )
+                        result = ml_function(inputs, parameters)
+                        logger.info(f"200: Successful request")
+                        response = Response(
+                            status=200, mimetype="application/json", response=result.model_dump_json()
+                        )
+                    except ValidationError as e:
+                        error = {"error": e.errors()}
+                        logger.error(f"400: Validation error: {error}")
+                        response = Response(
+                            status=400, mimetype="application/json", response=json.dumps(error)
+                        )
+                    except BadRequestError as e:
+                        logger.error(f"400: Bad request: {e}")
+                        response = Response(
+                            status=400, mimetype="application/json", response=json.dumps({"error": str(e)})
+                        )
+                    except Exception as e:
+                        logger.error(f"500: Internal server error: {repr(e)}")
+                        logger.error(traceback.format_exc())
+                        response = Response(
+                            status=500, mimetype="application/json", response=json.dumps({"error": repr(e)})
+                        )
+                    return response
+
+                return wrapper
 
         return build_route
 
