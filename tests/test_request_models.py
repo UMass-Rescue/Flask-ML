@@ -3,13 +3,12 @@ import unittest
 from pydantic import ValidationError
 
 from flask_ml.flask_ml_server.models import (
+    BatchFileInput,
+    BatchTextInput,
+    DirectoryInput,
     FileInput,
     RequestBody,
     TextInput,
-    DirectoryInput,
-    TextInput,
-    BatchFileInput,
-    BatchTextInput,
 )
 
 
@@ -53,7 +52,10 @@ class TestBatchFileInputModel(unittest.TestCase):
     def test_valid_batch_file_input(self):
         data = {"files": [{"path": "/path/to/file1.txt"}, {"path": "/path/to/file2.txt"}]}
         batch_file_input = BatchFileInput.model_validate(data)
-        self.assertEqual(batch_file_input.model_dump()["files"], [{"path": "/path/to/file1.txt"}, {"path": "/path/to/file2.txt"}])
+        self.assertEqual(
+            batch_file_input.model_dump()["files"],
+            [{"path": "/path/to/file1.txt"}, {"path": "/path/to/file2.txt"}],
+        )
 
     def test_invalid_batch_file_input_missing_file_paths(self):
         data = {}
@@ -65,12 +67,15 @@ class TestBatchTextInputModel(unittest.TestCase):
     def test_valid_batch_text_input(self):
         data = {"texts": [{"text": "This is text1"}, {"text": "This is text2"}]}
         batch_text_input = BatchTextInput.model_validate(data)
-        self.assertEqual(batch_text_input.model_dump()["texts"], [{"text": "This is text1"}, {"text": "This is text2"}])
+        self.assertEqual(
+            batch_text_input.model_dump()["texts"], [{"text": "This is text1"}, {"text": "This is text2"}]
+        )
 
     def test_invalid_batch_text_input_missing_texts(self):
         data = {}
         with self.assertRaises(ValidationError):
             BatchTextInput(**data)
+
 
 if __name__ == "__main__":
     unittest.main()

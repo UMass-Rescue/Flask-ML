@@ -1,9 +1,9 @@
 from typing import List, TypedDict
 from unittest.mock import patch
 
+import pytest
 from flask.json import jsonify
 from flask.wrappers import Response
-import pytest
 
 from flask_ml.flask_ml_client import MLClient
 from flask_ml.flask_ml_server import MLServer
@@ -196,6 +196,8 @@ def test_valid_fike_request_client(mock_post, client):
             }
         ],
     }
+
+
 def test_invalid_file_request(app):
     data = {
         "inputs": {"file_inputs": {"INVALID_KEY": [{"path": "/path/to/image.jpg"}]}},
@@ -205,7 +207,4 @@ def test_invalid_file_request(app):
 
     assert response.status_code == 400
     assert "VALIDATION_ERROR" == response.json["status"]
-    assert (
-        "Field required"
-        == response.json["error"][0]["msg"]
-    )
+    assert "Field required" == response.json["error"][0]["msg"]
