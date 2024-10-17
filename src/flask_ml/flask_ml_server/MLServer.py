@@ -139,7 +139,9 @@ class MLServer(object):
                     endpoint.sample_payload_rule, endpoint=endpoint.sample_payload_rule, methods=["GET"]
                 )
                 def get_sample_payload():
-                    return jsonify(schema_get_sample_payload(endpoint.task_schema_func()).model_dump(mode="json"))
+                    return jsonify(
+                        schema_get_sample_payload(endpoint.task_schema_func()).model_dump(mode="json")
+                    )
 
                 @self.app.route(
                     endpoint.payload_schema_rule, endpoint=endpoint.payload_schema_rule, methods=["GET"]

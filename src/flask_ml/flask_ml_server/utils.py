@@ -1,26 +1,17 @@
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    List,
-    Mapping,
-    Union,
-    assert_never,
-    get_type_hints,
-)
+from typing import Any, Callable, Dict, List, Mapping, Union, get_type_hints
 
 from pydantic import BaseModel
+from typing_extensions import assert_never
 
+from flask_ml.flask_ml_server import models
 from flask_ml.flask_ml_server.errors import BadRequestError
 from flask_ml.flask_ml_server.MLServer import TaskSchema
-from flask_ml.flask_ml_server import models
 from flask_ml.flask_ml_server.models import (
     BatchFileInput,
     BatchTextInput,
     DirectoryInput,
     EnumParameterDescriptor,
     FileInput,
-    InputUnion,
     FloatParameterDescriptor,
     Input,
     InputType,
@@ -74,8 +65,8 @@ def schema_get_inputs(schema: TaskSchema, data_: Dict[str, Any]):
     json_inputs = validate_data_is_dict(data_, "inputs")
     input_schema = schema.inputs
     input_keys_to_input_type = {inputt.key: inputt.input_type for inputt in input_schema}
-    input_keys = list(input_keys_to_input_type.keys())
-    json_keys = list(json_inputs.keys())
+    input_keys = set(input_keys_to_input_type.keys())
+    json_keys = set(json_inputs.keys())
     if input_keys != json_keys:
         raise BadRequestError(
             f"Keys mismatch. The input schema has {input_keys=} while your json data has {json_keys=}. Ensure the request body contains all keys under the key 'inputs'. Call /api/routes to see how to use the API."
@@ -86,8 +77,8 @@ def schema_get_inputs(schema: TaskSchema, data_: Dict[str, Any]):
 def schema_get_parameters(schema: TaskSchema, data_: Dict[str, Any]) -> Dict[str, Union[str, int, float]]:
     json_parameters = validate_data_is_dict(data_, "parameters")
     parameter_schema = schema.parameters
-    parameter_keys = [parameter.key for parameter in parameter_schema]
-    json_keys = list(json_parameters.keys())
+    parameter_keys = set([parameter.key for parameter in parameter_schema])
+    json_keys = set(json_parameters.keys())
     if parameter_keys != json_keys:
         raise BadRequestError(
             f"Keys mismatch. The parameter schema has {parameter_keys=} while your json data has {json_keys=}. Ensure the request body contains all keys under the key 'parameters'. Call /api/routes to see how to use the API."
@@ -184,6 +175,7 @@ def resolve_input_sample(input_type: Any) -> Input:
             )
         case _:
             assert_never(input_type)
+
 
 def is_typeddict(cls):
     return isinstance(cls, type) and hasattr(cls, "__annotations__")
@@ -319,8 +311,8 @@ def resolve_input_with_data(input_type: Any, data: Dict[str, Any]):
 
 def no_schema_get_inputs(inputs_typed_dict_hints: Mapping[str, BaseModel], data_: Dict[str, Any]):
     json_inputs = validate_data_is_dict(data_, "inputs")
-    input_keys = list(inputs_typed_dict_hints.keys())
-    json_keys = list(json_inputs.keys())
+    input_keys = set(inputs_typed_dict_hints.keys())
+    json_keys = set(json_inputs.keys())
     if input_keys != json_keys:
         raise BadRequestError(
             f"Keys mismatch. The input schema has {input_keys=} while your json data has {json_keys=}. Ensure the request body contains all keys under the key 'inputs'. Call /api/routes to see how to use the API."
@@ -334,8 +326,8 @@ def no_schema_get_parameters(
     parameters_typed_dict_hints: Mapping[str, Union[str, int, float]], data_: Dict[str, Any]
 ) -> Dict[str, Union[str, int, float]]:
     json_parameters = validate_data_is_dict(data_, "parameters")
-    parameter_keys = list(parameters_typed_dict_hints.keys())
-    json_keys = list(json_parameters.keys())
+    parameter_keys = set(parameters_typed_dict_hints.keys())
+    json_keys = set(json_parameters.keys())
     if parameter_keys != json_keys:
         raise BadRequestError(
             f"Keys mismatch. The parameter schema has {parameter_keys=} while your json data has {json_keys=}. Ensure the request body contains all keys under the key 'parameters'. Call /api/routes to see how to use the API."

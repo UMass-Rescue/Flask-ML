@@ -156,7 +156,7 @@ components:
         - $ref: "#/components/schemas/TextInput"
         - $ref: "#/components/schemas/BatchFileInput"
         - $ref: "#/components/schemas/BatchTextInput"
-         
+          
     FileInput:
       type: object
       required: [path]

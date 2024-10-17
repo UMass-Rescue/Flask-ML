@@ -34,11 +34,14 @@ SENTIMENT_ANALYSIS_TASK_SCHEMA = TaskSchema(
     parameters=[],
 )
 
+
 def create_task_schema() -> TaskSchema:
     return SENTIMENT_ANALYSIS_TASK_SCHEMA
 
+
 class SentimentInputs(TypedDict):
     text_inputs: BatchTextInput
+
 
 class Parameters(TypedDict): ...
 
