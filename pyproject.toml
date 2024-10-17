@@ -51,3 +51,10 @@ set-default-enum-member = true
 use-default = true
 output-model-type = "pydantic_v2.BaseModel"
 allow-population-by-field-name = true
+
+[tool.black]
+line-length = 110
+
+
+[tool.isort]
+profile = "black"

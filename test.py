@@ -27,7 +27,7 @@ sentiment_model = SentimentModel()
 # Create a server
 server = MLServer(__name__)
 
-SENTIMENT_ANALYSIS_INPUT_SCHEMA = TaskSchema(
+SENTIMENT_ANALYSIS_TASK_SCHEMA = TaskSchema(
     inputs=[
         InputSchema(key="text_inputs", label="Choose a set of text inputs", input_type=InputType.BATCHTEXT)
     ],
@@ -43,7 +43,7 @@ class Parameters(TypedDict): ...
 
 
 # You can try adding input_schema = SENTIMENT_ANALYSIS_INPUT_SCHEMA below to the route decorator, and see how calling /api/routes changes
-@server.route("/randomsentimentanalysis")
+@server.route("/randomsentimentanalysis", task_schema=SENTIMENT_ANALYSIS_TASK_SCHEMA)
 def sentiment_analysis(inputs: SentimentInputs, parameters: Parameters) -> ResponseBody:
     results = sentiment_model.predict(inputs["text_inputs"].texts)
     text_results = [TextResponse(value=res["sentiment"]) for res in results]

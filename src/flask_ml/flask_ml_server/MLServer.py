@@ -33,6 +33,7 @@ from flask_ml.flask_ml_server.models import (
     TaskSchema,
 )
 from flask_ml.flask_ml_server.utils import (
+    ensure_ml_func_hinting_and_task_schemas_are_valid,
     ensure_ml_func_parameters_are_typed_dict,
     no_schema_get_inputs,
     no_schema_get_parameters,
@@ -54,8 +55,8 @@ class EndpointDetailsNoSchema:
 
 @dataclass
 class EndpointDetails(EndpointDetailsNoSchema):
-    input_schema_rule: str
-    input_schema: TaskSchema
+    task_schema_rule: str
+    task_schema: TaskSchema
     short_title: str
     order: int
 
@@ -82,7 +83,7 @@ class MLServer(object):
             routes = [
                 (
                     SchemaAPIRoute(
-                        input_schema=endpoint.input_schema_rule,
+                        task_schema=endpoint.task_schema_rule,
                         run_task=endpoint.rule,
                         sample_payload=endpoint.sample_payload_rule,
                         payload_schema=endpoint.payload_schema_rule,
@@ -103,7 +104,7 @@ class MLServer(object):
     def route(
         self,
         rule: str,
-        input_schema: Optional[TaskSchema] = None,
+        task_schema: Optional[TaskSchema] = None,
         short_title: Optional[str] = None,
         order: int = 0,
     ):
@@ -114,37 +115,37 @@ class MLServer(object):
 
         def build_route(ml_function: Callable[[Any, Any], ResponseBody]):
             ensure_ml_func_parameters_are_typed_dict(ml_function)
-            # TODO: Add validation here to check at first runtime if the schema and the inferred types match
-            if input_schema is not None:
+            if task_schema is not None:
+                ensure_ml_func_hinting_and_task_schemas_are_valid(ml_function, task_schema)
                 endpoint = EndpointDetails(
                     rule=rule,
-                    input_schema_rule=rule + "/input_schema",
+                    task_schema_rule=rule + "/task_schema",
                     sample_payload_rule=rule + "/sample_payload",
                     payload_schema_rule=rule + "/payload_schema",
                     func=ml_function,
-                    input_schema=input_schema,
+                    task_schema=task_schema,
                     short_title=short_title or "",
                     order=order,
                 )
                 self.endpoints.append(endpoint)
 
                 @self.app.route(
-                    endpoint.input_schema_rule, endpoint=endpoint.input_schema_rule, methods=["GET"]
+                    endpoint.task_schema_rule, endpoint=endpoint.task_schema_rule, methods=["GET"]
                 )
-                def get_input_schema():
-                    return jsonify(endpoint.input_schema.model_dump(mode="json"))
+                def get_task_schema():
+                    return jsonify(endpoint.task_schema.model_dump(mode="json"))
 
                 @self.app.route(
                     endpoint.sample_payload_rule, endpoint=endpoint.sample_payload_rule, methods=["GET"]
                 )
                 def get_sample_payload():
-                    return jsonify(schema_get_sample_payload(endpoint.input_schema).model_dump(mode="json"))
+                    return jsonify(schema_get_sample_payload(endpoint.task_schema).model_dump(mode="json"))
 
                 @self.app.route(
                     endpoint.payload_schema_rule, endpoint=endpoint.payload_schema_rule, methods=["GET"]
                 )
                 def get_payload_schema():
-                    return jsonify(schema_get_sample_payload(endpoint.input_schema).model_json_schema())
+                    return jsonify(schema_get_sample_payload(endpoint.task_schema).model_json_schema())
 
                 @self.app.route(rule, endpoint=ml_function.__name__, methods=["POST"])
                 def wrapper():
@@ -154,11 +155,11 @@ class MLServer(object):
                         json_inputs = data["inputs"]
                         json_parameters = data["parameters"]
 
-                        assert input_schema is not None, "FATAL: Input schema cannot be None here"
+                        assert task_schema is not None, "FATAL: Input schema cannot be None here"
 
-                        inputs = schema_get_inputs(input_schema, json_inputs)
+                        inputs = schema_get_inputs(task_schema, json_inputs)
                         parameters: Dict[str, Union[str, int, float]] = schema_get_parameters(
-                            input_schema, json_parameters
+                            task_schema, json_parameters
                         )
                         result = ml_function(inputs, parameters)
                         logger.info(f"200: Successful request")

@@ -26,7 +26,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/APIRoutes'
 
-  /tasks/generate_db/input_schema:
+  /tasks/generate_db/task_schema:
     get:
       summary: Get Input Schema for Generating Database
       responses:
@@ -55,7 +55,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ResponseBody'
 
-  /tasks/face_match/input_schema:
+  /tasks/face_match/task_schema:
     get:
       summary: Get Input Schema for Face Matching
       responses:
@@ -113,11 +113,11 @@ components:
     
     SchemaAPIRoute:
       type: object
-      required: [input_schema, run_task, payload_schema, short_title, order]
+      required: [task_schema, run_task, payload_schema, short_title, order]
       properties:
-        input_schema:
+        task_schema:
           type: string
-          example: "/tasks/{name_of_task}/input_schema"
+          example: "/tasks/{name_of_task}/task_schema"
         run_task:
           type: string
           example: "/tasks/{name_of_task}"
@@ -302,6 +302,8 @@ components:
                 type: string
               key:
                 type: string
+        messageWhenEmpty:
+          type: string
         default:
           type: string
 
