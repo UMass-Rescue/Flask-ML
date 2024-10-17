@@ -56,7 +56,7 @@ class EndpointDetailsNoSchema:
 @dataclass
 class EndpointDetails(EndpointDetailsNoSchema):
     task_schema_rule: str
-    task_schema: TaskSchema
+    task_schema_func: Callable[[], TaskSchema]
     short_title: str
     order: int
 
@@ -104,7 +104,7 @@ class MLServer(object):
     def route(
         self,
         rule: str,
-        task_schema: Optional[TaskSchema] = None,
+        task_schema_func: Optional[Callable[[], TaskSchema]] = None,
         short_title: Optional[str] = None,
         order: int = 0,
     ):
@@ -115,15 +115,15 @@ class MLServer(object):
 
         def build_route(ml_function: Callable[[Any, Any], ResponseBody]):
             ensure_ml_func_parameters_are_typed_dict(ml_function)
-            if task_schema is not None:
-                ensure_ml_func_hinting_and_task_schemas_are_valid(ml_function, task_schema)
+            if task_schema_func is not None:
+                ensure_ml_func_hinting_and_task_schemas_are_valid(ml_function, task_schema_func())
                 endpoint = EndpointDetails(
                     rule=rule,
                     task_schema_rule=rule + "/task_schema",
                     sample_payload_rule=rule + "/sample_payload",
                     payload_schema_rule=rule + "/payload_schema",
                     func=ml_function,
-                    task_schema=task_schema,
+                    task_schema_func=task_schema_func,
                     short_title=short_title or "",
                     order=order,
                 )
@@ -133,19 +133,19 @@ class MLServer(object):
                     endpoint.task_schema_rule, endpoint=endpoint.task_schema_rule, methods=["GET"]
                 )
                 def get_task_schema():
-                    return jsonify(endpoint.task_schema.model_dump(mode="json"))
+                    return jsonify(endpoint.task_schema_func().model_dump(mode="json"))
 
                 @self.app.route(
                     endpoint.sample_payload_rule, endpoint=endpoint.sample_payload_rule, methods=["GET"]
                 )
                 def get_sample_payload():
-                    return jsonify(schema_get_sample_payload(endpoint.task_schema).model_dump(mode="json"))
+                    return jsonify(schema_get_sample_payload(endpoint.task_schema_func()).model_dump(mode="json"))
 
                 @self.app.route(
                     endpoint.payload_schema_rule, endpoint=endpoint.payload_schema_rule, methods=["GET"]
                 )
                 def get_payload_schema():
-                    return jsonify(schema_get_sample_payload(endpoint.task_schema).model_json_schema())
+                    return jsonify(schema_get_sample_payload(endpoint.task_schema_func()).model_json_schema())
 
                 @self.app.route(rule, endpoint=ml_function.__name__, methods=["POST"])
                 def wrapper():
@@ -155,11 +155,11 @@ class MLServer(object):
                         json_inputs = data["inputs"]
                         json_parameters = data["parameters"]
 
-                        assert task_schema is not None, "FATAL: Input schema cannot be None here"
+                        assert task_schema_func is not None, "FATAL: Input schema cannot be None here"
 
-                        inputs = schema_get_inputs(task_schema, json_inputs)
+                        inputs = schema_get_inputs(task_schema_func(), json_inputs)
                         parameters: Dict[str, Union[str, int, float]] = schema_get_parameters(
-                            task_schema, json_parameters
+                            task_schema_func(), json_parameters
                         )
                         result = ml_function(inputs, parameters)
                         logger.info(f"200: Successful request")

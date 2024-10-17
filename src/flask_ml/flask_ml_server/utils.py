@@ -13,16 +13,17 @@ from pydantic import BaseModel
 
 from flask_ml.flask_ml_server.errors import BadRequestError
 from flask_ml.flask_ml_server.MLServer import TaskSchema
+from flask_ml.flask_ml_server import models
 from flask_ml.flask_ml_server.models import (
     BatchFileInput,
     BatchTextInput,
     DirectoryInput,
     EnumParameterDescriptor,
     FileInput,
+    InputUnion,
     FloatParameterDescriptor,
     Input,
     InputType,
-    InputUnion,
     IntParameterDescriptor,
     ParameterType,
     RangedFloatParameterDescriptor,
@@ -156,33 +157,33 @@ def schema_get_sample_payload(schema: TaskSchema) -> RequestBody:
 
 def resolve_input_sample(input_type: Any) -> Input:
     # TODO: Add a parameterized test for this function
-    if input_type is FileInput:
-        return Input(root=FileInput(path="/Users/path/to/file"))
-    elif input_type is DirectoryInput:
-        return Input(root=DirectoryInput(path="/Users/path/to/folder"))
-    elif input_type is TextInput:
-        return Input(root=TextInput(text="A sample piece of text"))
-    elif input_type is BatchFileInput:
-        return Input(
-            root=BatchFileInput(
-                files=[
-                    FileInput(path="/Users/path/to/file1"),
-                    FileInput(path="/Users/path/to/file2"),
-                ]
+    match input_type:
+        case models.FileInput:
+            return Input(root=FileInput(path="/Users/path/to/file"))
+        case models.DirectoryInput:
+            return Input(root=DirectoryInput(path="/Users/path/to/folder"))
+        case models.TextInput:
+            return Input(root=TextInput(text="A sample piece of text"))
+        case models.BatchFileInput:
+            return Input(
+                root=BatchFileInput(
+                    files=[
+                        FileInput(path="/Users/path/to/file1"),
+                        FileInput(path="/Users/path/to/file2"),
+                    ]
+                )
             )
-        )
-    elif input_type is BatchTextInput:
-        return Input(
-            root=BatchTextInput(
-                texts=[
-                    TextInput(text="A sample piece of text 1"),
-                    TextInput(text="A sample piece of text 2"),
-                ]
+        case models.BatchTextInput:
+            return Input(
+                root=BatchTextInput(
+                    texts=[
+                        TextInput(text="A sample piece of text 1"),
+                        TextInput(text="A sample piece of text 2"),
+                    ]
+                )
             )
-        )
-    else:
-        raise BadRequestError(f"Unsupported input type: {input_type}")
-
+        case _:
+            assert_never(input_type)
 
 def is_typeddict(cls):
     return isinstance(cls, type) and hasattr(cls, "__annotations__")
@@ -313,22 +314,7 @@ def type_hinting_get_sample_payload(hints: Dict[str, Any]) -> RequestBody:
 
 def resolve_input_with_data(input_type: Any, data: Dict[str, Any]):
     # TODO: Add a parameterized test for this function
-    if input_type is FileInput:
-        return FileInput(**data)
-    elif input_type is DirectoryInput:
-        return DirectoryInput(**data)
-    elif input_type is TextInput:
-        return TextInput(**data)
-    elif input_type is BatchFileInput:
-        return BatchFileInput(
-            **data,
-        )
-    elif input_type is BatchTextInput:
-        return BatchTextInput(
-            **data,
-        )
-    else:
-        raise BadRequestError(f"Unsupported input type: {input_type}")
+    return input_type(**data)
 
 
 def no_schema_get_inputs(inputs_typed_dict_hints: Mapping[str, BaseModel], data_: Dict[str, Any]):

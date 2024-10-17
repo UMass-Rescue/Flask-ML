@@ -34,16 +34,17 @@ SENTIMENT_ANALYSIS_TASK_SCHEMA = TaskSchema(
     parameters=[],
 )
 
+def create_task_schema() -> TaskSchema:
+    return SENTIMENT_ANALYSIS_TASK_SCHEMA
 
 class SentimentInputs(TypedDict):
     text_inputs: BatchTextInput
-
 
 class Parameters(TypedDict): ...
 
 
 # You can try adding input_schema = SENTIMENT_ANALYSIS_INPUT_SCHEMA below to the route decorator, and see how calling /api/routes changes
-@server.route("/randomsentimentanalysis", task_schema=SENTIMENT_ANALYSIS_TASK_SCHEMA)
+@server.route("/randomsentimentanalysis", task_schema_func=create_task_schema)
 def sentiment_analysis(inputs: SentimentInputs, parameters: Parameters) -> ResponseBody:
     results = sentiment_model.predict(inputs["text_inputs"].texts)
     text_results = [TextResponse(value=res["sentiment"]) for res in results]
