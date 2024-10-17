@@ -156,10 +156,12 @@ class MLServer(object):
                         json_parameters = data["parameters"]
 
                         assert task_schema_func is not None, "FATAL: Input schema cannot be None here"
+                        task_schema = task_schema_func()
+                        ensure_ml_func_hinting_and_task_schemas_are_valid(ml_function, task_schema)
 
-                        inputs = schema_get_inputs(task_schema_func(), json_inputs)
+                        inputs = schema_get_inputs(task_schema, json_inputs)
                         parameters: Dict[str, Union[str, int, float]] = schema_get_parameters(
-                            task_schema_func(), json_parameters
+                            task_schema, json_parameters
                         )
                         result = ml_function(inputs, parameters)
                         logger.info(f"200: Successful request")
