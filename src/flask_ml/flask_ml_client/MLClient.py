@@ -1,9 +1,10 @@
-from typing import Any, Union
+import json
+from typing import Any, Dict
 
 import requests
 
-from flask_ml.flask_ml_server.models import (ErrorResponseModel, RequestModel,
-                                             ResponseModel)
+from flask_ml.flask_ml_server.MLServer import Input
+from flask_ml.flask_ml_server.models import RequestBody, ResponseBody
 
 UNKNOWN_ERROR = "Unknown error. Please refer to the status field."
 
@@ -28,28 +29,24 @@ class MLClient:
         """
         self.url = url
 
-    def request(
-        self, inputs: list[dict], data_type: str, parameters: dict = {}
-    ) -> Union[dict[str, Any], list[dict]]:
+    def request(self, inputs: Dict[str, Input], parameters: Dict[str, Any] = {}):
         """
         Sends a request to the server.
         inputs : list - the list of dictionaries containing the data to be sent to the server
         data_type : str - the type of the input data
         parameters : dict - the parameters to be sent to the server
         """
-        request_model = RequestModel(
-            inputs=inputs, data_type=data_type, parameters=parameters  # type: ignore
-        )
+        request_model = RequestBody(inputs=inputs, parameters=parameters)
         response = requests.post(
             self.url,
             json=request_model.model_dump(),
         )
         if "application/json" not in response.headers.get("Content-Type", ""):
-            return ErrorResponseModel(
-                status=f"Unknown error. status_code={str(response.status_code)}",
-                errors=[{"msg": UNKNOWN_ERROR}],
-            ).model_dump()
+            return {
+                "status": f"Unknown error. status_code={str(response.status_code)}",
+                "errors": [{"msg": UNKNOWN_ERROR}],
+            }
         if response.status_code != 200:
-            return ErrorResponseModel(**response.json()).model_dump()
-        response_model = ResponseModel(**response.json())
-        return response_model.model_dump()["results"]
+            return response.json()
+        response_model = ResponseBody(**response.json())
+        return response_model.model_dump()
