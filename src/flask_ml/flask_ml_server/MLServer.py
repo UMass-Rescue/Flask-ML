@@ -171,7 +171,7 @@ class MLServer(object):
                             status=200, mimetype="application/json", response=result.model_dump_json()
                         )
                     except ValidationError as e:
-                        error = {"error": e.errors()}
+                        error = {"error": e.errors(), "status": "VALIDATION_ERROR"}
                         logger.error(f"400: Validation error: {error}")
                         response = Response(
                             status=400, mimetype="application/json", response=json.dumps(error)
@@ -179,13 +179,13 @@ class MLServer(object):
                     except BadRequestError as e:
                         logger.error(f"400: Bad request: {e}")
                         response = Response(
-                            status=400, mimetype="application/json", response=json.dumps({"error": str(e)})
+                            status=400, mimetype="application/json", response=json.dumps({"error": str(e), "status": "VALIDATION_ERROR"})
                         )
                     except Exception as e:
                         logger.error(f"500: Internal server error: {repr(e)}")
                         logger.error(traceback.format_exc())
                         response = Response(
-                            status=500, mimetype="application/json", response=json.dumps({"error": repr(e)})
+                            status=500, mimetype="application/json", response=json.dumps({"error": repr(e), "status": "SERVER_ERROR"})
                         )
                     return response
 
@@ -230,7 +230,7 @@ class MLServer(object):
                             status=200, mimetype="application/json", response=result.model_dump_json()
                         )
                     except ValidationError as e:
-                        error = {"error": e.errors()}
+                        error = {"error": e.errors(), "status": "VALIDATION_ERROR"}
                         logger.error(f"400: Validation error: {error}")
                         response = Response(
                             status=400, mimetype="application/json", response=json.dumps(error)
@@ -238,13 +238,13 @@ class MLServer(object):
                     except BadRequestError as e:
                         logger.error(f"400: Bad request: {e}")
                         response = Response(
-                            status=400, mimetype="application/json", response=json.dumps({"error": str(e)})
+                            status=400, mimetype="application/json", response=json.dumps({"error": str(e), "status": "VALIDATION_ERROR"})
                         )
                     except Exception as e:
                         logger.error(f"500: Internal server error: {repr(e)}")
                         logger.error(traceback.format_exc())
                         response = Response(
-                            status=500, mimetype="application/json", response=json.dumps({"error": repr(e)})
+                            status=500, mimetype="application/json", response=json.dumps({"error": repr(e), "status": "SERVER_ERROR"})
                         )
                     return response
 

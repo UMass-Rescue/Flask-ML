@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
 import requests
 
@@ -29,14 +29,14 @@ class MLClient:
         """
         self.url = url
 
-    def request(self, inputs: Dict[str, Input], parameters: Dict[str, Any] = {}):
+    def request(self, inputs: Union[Dict[str, Input], Dict[str, Dict]], parameters: Dict[str, Any] = {}):
         """
         Sends a request to the server.
         inputs : list - the list of dictionaries containing the data to be sent to the server
         data_type : str - the type of the input data
         parameters : dict - the parameters to be sent to the server
         """
-        request_model = RequestBody(inputs=inputs, parameters=parameters)
+        request_model = RequestBody.model_validate({"inputs": inputs, "parameters": parameters})
         response = requests.post(
             self.url,
             json=request_model.model_dump(),
@@ -49,4 +49,4 @@ class MLClient:
         if response.status_code != 200:
             return response.json()
         response_model = ResponseBody(**response.json())
-        return response_model.model_dump()
+        return response_model.model_dump(mode="json")

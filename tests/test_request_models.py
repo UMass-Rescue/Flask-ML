@@ -2,23 +2,25 @@ import unittest
 
 from pydantic import ValidationError
 
-from flask_ml.flask_ml_server.models import (CustomInput, DataTypes, FileInput,
-                                             RequestModel, TextInput)
+from flask_ml.flask_ml_server.models import (
+    FileInput,
+    RequestBody,
+    TextInput,
+    DirectoryInput,
+    TextInput,
+    BatchFileInput,
+    BatchTextInput,
+)
 
 
 class TestFileInputModel(unittest.TestCase):
     def test_valid_file_input(self):
-        data = {"file_path": "/path/to/file.txt"}
+        data = {"path": "/path/to/file.txt"}
         file_input = FileInput(**data)
-        self.assertEqual(file_input.file_path, "/path/to/file.txt")
+        self.assertEqual(file_input.path, "/path/to/file.txt")
 
     def test_invalid_file_input_missing_file_path(self):
         data = {}
-        with self.assertRaises(ValidationError):
-            FileInput(**data)
-
-    def test_invalid_file_input_empty_file_path(self):
-        data = {"file_path": ""}
         with self.assertRaises(ValidationError):
             FileInput(**data)
 
@@ -34,126 +36,41 @@ class TestTextInputModel(unittest.TestCase):
         with self.assertRaises(ValidationError):
             TextInput(**data)
 
-    def test_invalid_text_input_empty_text(self):
-        data = {"text": ""}
+
+class TestDirectoryInputModel(unittest.TestCase):
+    def test_valid_directory_input(self):
+        data = {"path": "/path/to/directory"}
+        directory_input = DirectoryInput(**data)
+        self.assertEqual(directory_input.path, "/path/to/directory")
+
+    def test_invalid_directory_input_missing_directory_path(self):
+        data = {}
         with self.assertRaises(ValidationError):
-            TextInput(**data)
+            DirectoryInput(**data)
 
 
-class TestRequestModel(unittest.TestCase):
-    def test_valid_request_with_text_inputs(self):
-        data = {
-            "inputs": [{"text": "First text"}, {"text": "Second text"}],
-            "data_type": DataTypes.TEXT.name,
-            "parameters": {},
-        }
-        request = RequestModel(**data)
-        self.assertEqual(request.data_type, DataTypes.TEXT)
-        self.assertEqual(len(request.inputs), 2)
-        self.assertIsInstance(request.inputs[0], TextInput)
-        self.assertEqual(request.inputs[0].text, "First text")
+class TestBatchFileInputModel(unittest.TestCase):
+    def test_valid_batch_file_input(self):
+        data = {"files": [{"path": "/path/to/file1.txt"}, {"path": "/path/to/file2.txt"}]}
+        batch_file_input = BatchFileInput.model_validate(data)
+        self.assertEqual(batch_file_input.model_dump()["files"], [{"path": "/path/to/file1.txt"}, {"path": "/path/to/file2.txt"}])
 
-    def test_valid_request_with_file_inputs(self):
-        data = {
-            "inputs": [
-                {"file_path": "/path/to/file1.txt"},
-                {"file_path": "/path/to/file2.txt"},
-            ],
-            "data_type": DataTypes.IMAGE.name,
-            "parameters": {},
-        }
-        request = RequestModel(**data)
-        self.assertEqual(request.data_type, DataTypes.IMAGE)
-        self.assertEqual(len(request.inputs), 2)
-        self.assertIsInstance(request.inputs[0], FileInput)
-        self.assertEqual(request.inputs[0].file_path, "/path/to/file1.txt")
-
-    def test_valid_request_with_custom_inputs(self):
-        data = {
-            "inputs": [
-                {"input": ["inp1", {"a": "b"}, 123]},
-                {"input": {"key": "value"}},
-            ],
-            "data_type": DataTypes.CUSTOM.name,
-            "parameters": {},
-        }
-        request = RequestModel(**data)
-        self.assertEqual(request.data_type, DataTypes.CUSTOM)
-        self.assertEqual(len(request.inputs), 2)
-        self.assertIsInstance(request.inputs[0], CustomInput)
-        self.assertEqual(request.inputs[0].input, ["inp1", {"a": "b"}, 123])
-        self.assertEqual(request.inputs[1].input, {"key": "value"})
-
-    def test_parameters_are_optional(self):
-        data = {
-            "inputs": [
-                {"file_path": "/path/to/file1.txt"},
-                {"file_path": "/path/to/file2.txt"},
-            ],
-            "data_type": DataTypes.IMAGE.name,
-        }
-        request = RequestModel(**data)
-        self.assertEqual(request.data_type, DataTypes.IMAGE)
-        self.assertEqual(len(request.inputs), 2)
-        self.assertIsInstance(request.inputs[0], FileInput)
-        self.assertEqual(request.inputs[0].file_path, "/path/to/file1.txt")
-
-    def test_invalid_request_with_mismatched_data_type_and_text_input(self):
-        data = {
-            "inputs": [{"text": "Some text input"}],
-            "data_type": DataTypes.IMAGE.name,
-            "parameters": {},
-        }
+    def test_invalid_batch_file_input_missing_file_paths(self):
+        data = {}
         with self.assertRaises(ValidationError):
-            RequestModel(**data)
+            BatchFileInput(**data)
 
-    def test_invalid_request_with_mismatched_data_type_and_file_input(self):
-        data = {
-            "inputs": [{"file_path": "/path/to/file.txt"}],
-            "data_type": DataTypes.TEXT.name,
-            "parameters": {},
-        }
+
+class TestBatchTextInputModel(unittest.TestCase):
+    def test_valid_batch_text_input(self):
+        data = {"texts": [{"text": "This is text1"}, {"text": "This is text2"}]}
+        batch_text_input = BatchTextInput.model_validate(data)
+        self.assertEqual(batch_text_input.model_dump()["texts"], [{"text": "This is text1"}, {"text": "This is text2"}])
+
+    def test_invalid_batch_text_input_missing_texts(self):
+        data = {}
         with self.assertRaises(ValidationError):
-            RequestModel(**data)
-
-    def test_invalid_request_with_invalid_data_type(self):
-        data = {
-            "inputs": [{"file_path": "/path/to/file.txt"}],
-            "data_type": "INVALID_TYPE",
-            "parameters": {},
-        }
-        with self.assertRaises(ValidationError):
-            RequestModel(**data)
-
-    def test_valid_request_with_complex_parameters(self):
-        data = {
-            "inputs": [
-                {"file_path": "/path/to/file1.txt"},
-                {"file_path": "/path/to/file2.txt"},
-            ],
-            "data_type": DataTypes.IMAGE.name,
-            "parameters": {"threshold": 0.8, "option": [1, 2, 3]},
-        }
-        request = RequestModel(**data)
-        self.assertEqual(request.parameters, {"threshold": 0.8, "option": [1, 2, 3]})
-
-    # New test case to handle invalid input in a mixed input list
-    def test_invalid_mixed_inputs(self):
-        data = {
-            "inputs": [
-                {"file_path": "/path/to/audio"},  # valid
-                {"fp": "/path/to/audio2"},  # invalid, missing 'file_path'
-            ],
-            "data_type": DataTypes.AUDIO.name,
-            "parameters": {},
-        }
-        with self.assertRaises(ValidationError) as exc_info:
-            RequestModel(**data)
-        self.assertIn(
-            "All inputs must contain 'file_path' when data_type is AUDIO",
-            str(exc_info.exception),
-        )
-
+            BatchTextInput(**data)
 
 if __name__ == "__main__":
     unittest.main()

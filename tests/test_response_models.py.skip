@@ -53,8 +53,8 @@ class TestResponseModel(unittest.TestCase):
             "status": "success",
             "results": BatchImageResult(
                 results=[
-                    {"id": "file1.txt", "result": "output_file1.png"},
-                    {"id": "file2.txt", "result": "output_file2.png"},
+                    ImageResult(**{"id": "file1.txt", "result": "output_file1.png"}),
+                    ImageResult(**{"id": "file2.txt", "result": "output_file2.png"}),
                 ]
             ),
         }
@@ -81,9 +81,7 @@ class TestResponseModel(unittest.TestCase):
         self.assertEqual(response.results.results[0].id, "This is the first text")
 
     def test_valid_response_with_missing_status(self):
-        data = {
-            "results": {"results": [{"id": "file1.txt", "result": "output_file1.txt"}]}
-        }
+        data = {"results": {"results": [{"id": "file1.txt", "result": "output_file1.txt"}]}}
         response = ResponseModel(**data)
         self.assertEqual(response.status, "SUCCESS")
 
@@ -127,9 +125,7 @@ class TestResponseModel(unittest.TestCase):
     def test_get_response_custom_status_code(self):
         response_model = ResponseModel(
             status="SUCCESS",
-            results=BatchTextResult(
-                results=[TextResult(result="Processed text", id="Sample text")]
-            ),
+            results=BatchTextResult(results=[TextResult(result="Processed text", id="Sample text")]),
         )
         response = create_flask_response(response_model, status_code=201)
         assert response.status_code == 201
