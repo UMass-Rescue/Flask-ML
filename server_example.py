@@ -49,26 +49,25 @@ image_style_transfer_model = ImageStyleTransferModel()
 server = MLServer(__name__)
 
 
-PROCESS_TEXT_INPUT_SCHEMA = TaskSchema(
-    inputs=[
-        InputSchema(
-            key="text_input_list", label="Choose several text inputs", input_type=InputType.BATCHTEXT
-        ),
-        InputSchema(key="db_name", label="Database name", input_type=InputType.TEXT),
-    ],
-    parameters=[
-        ParameterSchema(
-            key="model_parameter",
-            label="Model parameter",
-            value=RangedFloatParameterDescriptor(range=FloatRangeDescriptor(min=0, max=1), default=0.5),
-        )
-    ],
-)
+def text_task_scehma() -> TaskSchema:
+    return TaskSchema(
+        inputs=[
+            InputSchema(
+                key="text_inputs", label="Choose several text inputs", input_type=InputType.BATCHTEXT
+            ),
+        ],
+        parameters=[
+            ParameterSchema(
+                key="model_parameter",
+                label="Model parameter",
+                value=RangedFloatParameterDescriptor(range=FloatRangeDescriptor(min=0, max=1), default=0.5),
+            )
+        ],
+    )
 
 
 class TextInputs(TypedDict):
-    text_input_list: BatchTextInput
-    db_name: TextInput
+    text_inputs: BatchTextInput
 
 
 class TextParameters(TypedDict):
@@ -76,18 +75,16 @@ class TextParameters(TypedDict):
 
 
 # Create an endpoint
-@server.route("/tasks/generate_db", input_schema=PROCESS_TEXT_INPUT_SCHEMA)
+@server.route("/dummymodel", task_schema_func=text_task_scehma)
 def process_text(inputs: TextInputs, parameters: TextParameters) -> ResponseBody:
     # Inputs
-    batch_of_text: BatchTextInput = inputs["text_input_list"]
+    batch_of_text: BatchTextInput = inputs["text_inputs"]
     list_of_texts: List[TextInput] = batch_of_text.texts
-    db_name = inputs["db_name"].text
 
     # Parameters
     float_param_value = parameters["model_parameter"]
 
     print(list_of_texts[0].text)
-    print(db_name)
     print(float_param_value)
 
     predictions = model.predict([txtModel.text.capitalize() for txtModel in list_of_texts])
@@ -97,40 +94,52 @@ def process_text(inputs: TextInputs, parameters: TextParameters) -> ResponseBody
     return ResponseBody(root=response)
 
 
-SENTIMENT_ANALYSIS_INPUT_SCHEMA = TaskSchema(
-    inputs=[
-        InputSchema(key="text_input", label="Choose a set of text inputs", input_type=InputType.BATCHTEXT)
-    ],
-    parameters=[],
-)
+def sentiment_analysis_task_schema() -> TaskSchema:
+    return TaskSchema(
+        inputs=[
+            InputSchema(
+                key="text_inputs", label="Choose a set of text inputs", input_type=InputType.BATCHTEXT
+            )
+        ],
+        parameters=[],
+    )
 
 
 class SentimentInputs(TypedDict):
     text_inputs: BatchTextInput
 
 
-@server.route("/randomsentimentanalysis", input_schema=SENTIMENT_ANALYSIS_INPUT_SCHEMA)
-def sentiment_analysis(inputs: SentimentInputs, parameters: dict) -> ResponseBody:
+class SentimentParameters(TypedDict): ...
+
+
+@server.route("/randomsentimentanalysis", task_schema_func=sentiment_analysis_task_schema)
+def sentiment_analysis(inputs: SentimentInputs, parameters: SentimentParameters) -> ResponseBody:
     results = sentiment_model.predict(inputs["text_inputs"].texts)
     text_results = [TextResponse(value=res["sentiment"]) for res in results]
     response = BatchTextResponse(texts=text_results)
     return ResponseBody(root=response)
 
 
-IMAGE_STYLE_TRANSFER_SCHEMA = TaskSchema(
-    inputs=[
-        InputSchema(key="image_input", label="Choose a set of image inputs", input_type=InputType.BATCHFILE)
-    ],
-    parameters=[],
-)
+def image_style_transfer_task_schema() -> TaskSchema:
+    return TaskSchema(
+        inputs=[
+            InputSchema(
+                key="image_input", label="Choose a set of image inputs", input_type=InputType.BATCHFILE
+            )
+        ],
+        parameters=[],
+    )
 
 
 class ImageInput(TypedDict):
     image_input: BatchFileInput
 
 
-@server.route("/imagestyletransfer", input_schema=IMAGE_STYLE_TRANSFER_SCHEMA)
-def image_style_transfer(inputs: ImageInput, parameters: dict) -> ResponseBody:
+class ImageParameters(TypedDict): ...
+
+
+@server.route("/imagestyletransfer", task_schema_func=image_style_transfer_task_schema)
+def image_style_transfer(inputs: ImageInput, parameters: ImageParameters) -> ResponseBody:
     results = image_style_transfer_model.predict(inputs["image_input"].files)
     image_results = [FileResponse(file_type=FileType.IMG, path=res["result"]) for res in results]
     response = BatchFileResponse(files=image_results)
