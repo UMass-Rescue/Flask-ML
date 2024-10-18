@@ -366,7 +366,7 @@ components:
           type: number
         max:
           type: number
-    
+
     # Request Models
     RequestBody:
       type: object
