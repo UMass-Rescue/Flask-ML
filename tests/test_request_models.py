@@ -7,7 +7,6 @@ from flask_ml.flask_ml_server.models import (
     BatchTextInput,
     DirectoryInput,
     FileInput,
-    RequestBody,
     TextInput,
 )
 

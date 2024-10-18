@@ -1,32 +1,18 @@
-import inspect
 import json
 import traceback
 from dataclasses import dataclass
 from logging import getLogger
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    List,
-    Mapping,
-    Optional,
-    TypedDict,
-    Union,
-    get_args,
-    get_origin,
-    get_type_hints,
-)
+from typing import Any, Callable, Dict, List, Optional, Union, get_type_hints
 
 from flask_ml.flask_ml_server.errors import BadRequestError
 
 logger = getLogger(__name__)
 
 from flask import Flask, Response, jsonify, request
-from pydantic import BaseModel, ValidationError
+from pydantic import ValidationError
 
 from flask_ml.flask_ml_server.models import (
     APIRoutes,
-    Input,
     NoSchemaAPIRoute,
     ResponseBody,
     SchemaAPIRoute,

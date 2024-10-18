@@ -156,6 +156,7 @@ components:
         - $ref: "#/components/schemas/TextInput"
         - $ref: "#/components/schemas/BatchFileInput"
         - $ref: "#/components/schemas/BatchTextInput"
+        - $ref: "#/components/schemas/BatchDirectoryInput"
           
     FileInput:
       type: object
@@ -195,6 +196,15 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TextInput"
+    
+    BatchDirectoryInput:
+      type: object
+      required: [texts]
+      properties:
+        directories:
+          type: array
+          items:
+            $ref: "#/components/schemas/DirectoryInput"
 
     # Input Schema Models
     TaskSchema:

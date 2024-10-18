@@ -1,10 +1,8 @@
-import json
 from typing import Any, Dict, Union
 
 import requests
 
-from flask_ml.flask_ml_server.MLServer import Input
-from flask_ml.flask_ml_server.models import RequestBody, ResponseBody
+from flask_ml.flask_ml_server.models import Input, RequestBody, ResponseBody
 
 UNKNOWN_ERROR = "Unknown error. Please refer to the status field."
 

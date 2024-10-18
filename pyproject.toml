@@ -35,6 +35,7 @@ dev = [
     "types-requests",
     "pytest",
     "pytest-cov",
+    "autoflake8"
 ]
 
 [project.urls]

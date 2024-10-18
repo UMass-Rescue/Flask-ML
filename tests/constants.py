@@ -3,8 +3,12 @@ from flask_ml.flask_ml_server.models import *
 TEXT_INPUT_SCHEMA = InputSchema(key="text_input", label="Text Input", input_type=InputType.TEXT)
 TEXTAREA_INPUT_SCHEMA = InputSchema(key="text_input", label="Text Area Input", input_type=InputType.TEXTAREA)
 FILE_INPUT_SCHEMA = InputSchema(key="file_input", label="File Input", input_type=InputType.FILE)
-BATCHTEXT_INPUT_SCHEMA = InputSchema(key="text_inputs", label="Batch Text Inputs", input_type=InputType.BATCHTEXT)
-BATCHFILE_INPUT_SCHEMA = InputSchema(key="file_inputs", label="Batch File Inputs", input_type=InputType.BATCHFILE)
+BATCHTEXT_INPUT_SCHEMA = InputSchema(
+    key="text_inputs", label="Batch Text Inputs", input_type=InputType.BATCHTEXT
+)
+BATCHFILE_INPUT_SCHEMA = InputSchema(
+    key="file_inputs", label="Batch File Inputs", input_type=InputType.BATCHFILE
+)
 DIRECTORY_INPUT_SCHEMA = InputSchema(key="dir_input", label="Directory Input", input_type=InputType.DIRECTORY)
 
 TEXT_PARAM_SCHEMA = ParameterSchema(
