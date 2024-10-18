@@ -238,7 +238,7 @@ components:
     
     InputType:
       type: string
-      enum: ["file", "directory", "text", "textarea", "batchfile", "batchtext"]
+      enum: ["file", "directory", "text", "textarea", "batchfile", "batchtext", "batchdirectory"]
 
     ParameterSchema:
       type: object

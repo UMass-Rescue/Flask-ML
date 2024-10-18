@@ -7,6 +7,7 @@ from flask_ml.flask_ml_server import models
 from flask_ml.flask_ml_server.errors import BadRequestError
 from flask_ml.flask_ml_server.MLServer import TaskSchema
 from flask_ml.flask_ml_server.models import (
+    BatchDirectoryInput,
     BatchFileInput,
     BatchTextInput,
     DirectoryInput,
@@ -57,6 +58,8 @@ def input_from_data(input_type: InputType, data: Dict[str, Any]):
             return BatchFileInput(**data)
         case InputType.BATCHTEXT:
             return BatchTextInput(**data)
+        case InputType.BATCHDIRECTORY:
+            return BatchDirectoryInput(**data)
         case _:
             assert_never(input_type)
 
@@ -125,6 +128,15 @@ def schema_get_sample_payload(schema: TaskSchema) -> RequestBody:
                         ]
                     )
                 )
+            case InputType.BATCHDIRECTORY:
+                inputs[input_schema.key] = Input(
+                    root=BatchDirectoryInput(
+                        directories=[
+                            DirectoryInput(path="/Users/path/to/folder1"),
+                            DirectoryInput(path="/Users/path/to/folder2"),
+                        ]
+                    )
+                )
             case _:
                 assert_never(input_type)
     for parameter_schema in parameter_schema:
@@ -170,6 +182,15 @@ def resolve_input_sample(input_type: Any) -> Input:
                     texts=[
                         TextInput(text="A sample piece of text 1"),
                         TextInput(text="A sample piece of text 2"),
+                    ]
+                )
+            )
+        case models.BatchDirectoryInput:
+            return Input(
+                root=BatchDirectoryInput(
+                    directories=[
+                        DirectoryInput(path="/Users/path/to/folder1"),
+                        DirectoryInput(path="/Users/path/to/folder2"),
                     ]
                 )
             )
@@ -239,6 +260,10 @@ def ensure_ml_func_hinting_and_task_schemas_are_valid(
                 assert (
                     input_type_hint is BatchTextInput
                 ), f"For key {key}, the input type is InputType.BATCHTEXT, but the TypeDict hint is {input_type_hint}. Change to BatchTextInput."
+            case InputType.BATCHDIRECTORY:
+                assert (
+                    input_type_hint is BatchDirectoryInput
+                ), f"For key {key}, the input type is InputType.BATCHDIRECTORY, but the TypeDict hint is {input_type_hint}. Change to BatchDirectoryInput."
             case _:
                 assert_never(input_type)
 
