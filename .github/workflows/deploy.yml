@@ -21,7 +21,7 @@ jobs:
         with:
           node-version: 18
           cache: npm
-          cache-dependency-path: website/yarn-lock.yaml
+          cache-dependency-path: website/yarn.lock
 
       - name: Install dependencies
         run: npm ci
