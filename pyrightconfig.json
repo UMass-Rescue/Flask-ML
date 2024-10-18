@@ -1,0 +1,6 @@
+{
+  "python.analysis.typeCheckingMode": "basic",
+  "exclude": [
+    "src/flask_ml/flask_ml_server/_generated_models.py"
+  ]
+}

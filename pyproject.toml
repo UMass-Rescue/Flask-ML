@@ -22,7 +22,8 @@ classifiers = [
 dependencies = [
     "Flask",
     "requests",
-    "pydantic"
+    "pydantic",
+    "datamodel-code-generator"
 ]
 
 [project.optional-dependencies]
@@ -32,8 +33,28 @@ dev = [
     "flake8",
     "mypy",
     "types-requests",
-    "pytest"
+    "pytest",
+    "pytest-cov",
 ]
 
 [project.urls]
 Homepage = "https://github.com/UMass-Rescue/Flask-ML"
+
+[tool.datamodel-codegen]
+field-constraints = true
+snake-case-field = true
+strip-default-none = false
+target-python-version = "3.7"
+use-annotated = true
+capitalize-enum-members = true
+set-default-enum-member = true
+use-default = true
+output-model-type = "pydantic_v2.BaseModel"
+allow-population-by-field-name = true
+
+[tool.black]
+line-length = 110
+
+
+[tool.isort]
+profile = "black"

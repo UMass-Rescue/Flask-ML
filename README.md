@@ -21,3 +21,15 @@ Refer server_example.py
 #### Client
 
 Refer client_example.py
+
+#### Development
+
+Install both production and dev dependencies
+```
+pip install -e ".[dev]"
+```
+
+To re-generate the model classes, run
+```
+make generate-models
+```
