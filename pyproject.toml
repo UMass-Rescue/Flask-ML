@@ -7,6 +7,9 @@ name = "flask_ml"
 version = "0.2.0"
 authors = [
   { name="Prasanna Lakkur Subramanyam", email="psubramanyam@umass.edu" },
+  { name="Atharva Kale", email="aukale@umass.edu" },
+  { name="Shreyan Mallik", email="smallik@umass.edu" },
+  { name="Shriram Giridhara", email="sgiridhara@umass.edu" }
 ]
 description = "A Flask extension for running machine learning code"
 readme = "README.md"
