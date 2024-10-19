@@ -199,7 +199,7 @@ components:
     
     BatchDirectoryInput:
       type: object
-      required: [texts]
+      required: [directories]
       properties:
         directories:
           type: array
@@ -398,10 +398,11 @@ components:
         - $ref: '#/components/schemas/TextResponse'
         - $ref: '#/components/schemas/BatchFileResponse'
         - $ref: '#/components/schemas/BatchTextResponse'
+        - $ref: '#/components/schemas/BatchDirectoryResponse'
       
     ResponseType:
       type: string
-      enum: ["file", "directory", "markdown", "text", "batchfile", "batchtext"]
+      enum: ["file", "directory", "markdown", "text", "batchfile", "batchtext", "batchdirectory"]
 
     FileResponse:
       type: object
@@ -505,3 +506,18 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TextResponse"
+    
+    BatchDirectoryResponse:
+      type: object
+      required: [output_type, directories]
+      discriminator:
+        propertyName: output_type
+      properties:
+        output_type:
+          type: string
+          $ref: "#/components/schemas/ResponseType"
+          default: "batchdirectory"
+        directories:
+          type: array
+          items:
+            $ref: "#/components/schemas/DirectoryResponse"
