@@ -38,9 +38,9 @@ def validate_data_is_dict(data_: Any, key="Request body"):
 
 def validate_data_has_keys(data_: Any, keys: List[str]):
     data = validate_data_is_dict(data_)
-    if not set(data.keys()).issubset(set(keys)):
+    if set(data.keys()) != set(keys):
         raise BadRequestError(
-            f"Request body must be a valid JSON dictionary and contain all keys in {keys=}. Provided request body {data_} is not a valid. Call /api/routes to see how to use the API."
+            f"Request body must be a valid JSON dictionary and contain exactly the keys in {keys=}. Provided request body {data_} is not a valid. Call /api/routes to see how to use the API."
         )
 
 
@@ -330,7 +330,6 @@ def type_hinting_get_sample_payload(hints: Dict[str, Any]) -> RequestBody:
 
 
 def resolve_input_with_data(input_type: Any, data: Dict[str, Any]):
-    # TODO: Add a parameterized test for this function
     return input_type(**data)
 
 

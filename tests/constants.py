@@ -10,6 +10,9 @@ BATCHFILE_INPUT_SCHEMA = InputSchema(
     key="file_inputs", label="Batch File Inputs", input_type=InputType.BATCHFILE
 )
 DIRECTORY_INPUT_SCHEMA = InputSchema(key="dir_input", label="Directory Input", input_type=InputType.DIRECTORY)
+BATCHDIRECTORY_INPUT_SCHEMA = InputSchema(
+    key="dir_inputs", label="Batch Directory Inputs", input_type=InputType.BATCHDIRECTORY
+)
 
 TEXT_PARAM_SCHEMA = ParameterSchema(
     key="param1",
