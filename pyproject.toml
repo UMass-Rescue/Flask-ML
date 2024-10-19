@@ -4,13 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "flask_ml"
-version = "0.1.1"
+version = "0.2.0"
 authors = [
   { name="Prasanna Lakkur Subramanyam", email="psubramanyam@umass.edu" },
 ]
 description = "A Flask extension for running machine learning code"
 readme = "README.md"
-requires-python = ">=3.3"
+requires-python = ">=3.10"
 classifiers = [
     "Environment :: Web Environment",
     "Intended Audience :: Developers",
@@ -45,7 +45,7 @@ Homepage = "https://github.com/UMass-Rescue/Flask-ML"
 field-constraints = true
 snake-case-field = true
 strip-default-none = false
-target-python-version = "3.7"
+target-python-version = "3.10"
 use-annotated = true
 capitalize-enum-members = true
 set-default-enum-member = true
