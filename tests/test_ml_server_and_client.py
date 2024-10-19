@@ -436,7 +436,7 @@ def test_valid_file_request_client(mock_post, client):
 
 
 @patch("requests.post")
-def test_invalid_reponse_not_json(mock_post, client):
+def test_invalid_response_not_json(mock_post, client):
     data = {
         "inputs": {"file_inputs": {"files": [{"path": "/path/to/image.jpg"}]}},
         "parameters": {"param1": 0.0},
@@ -450,7 +450,7 @@ def test_invalid_reponse_not_json(mock_post, client):
 
 
 @patch("requests.post")
-def test_400_reponse(mock_post, client):
+def test_400_response(mock_post, client):
     data = {
         "inputs": {"file_inputs": {"files": [{"path": "/path/to/image.jpg"}]}},
         "parameters": {"param1": 0.0},
@@ -463,7 +463,7 @@ def test_400_reponse(mock_post, client):
     assert {"status": "failed"} == response
 
 @patch("requests.post")
-def test_500_reponse(mock_post, client):
+def test_500_response(mock_post, client):
     data = {
         "inputs": {"file_inputs": {"files": [{"path": "/path/to/image.jpg"}]}},
         "parameters": {"param1": 0.0},

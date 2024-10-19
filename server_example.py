@@ -49,7 +49,7 @@ image_style_transfer_model = ImageStyleTransferModel()
 server = MLServer(__name__)
 
 
-def text_task_scehma() -> TaskSchema:
+def text_task_schema() -> TaskSchema:
     return TaskSchema(
         inputs=[
             InputSchema(
@@ -75,7 +75,7 @@ class TextParameters(TypedDict):
 
 
 # Create an endpoint
-@server.route("/dummymodel", task_schema_func=text_task_scehma)
+@server.route("/dummymodel", task_schema_func=text_task_schema)
 def process_text(inputs: TextInputs, parameters: TextParameters) -> ResponseBody:
     # Inputs
     batch_of_text: BatchTextInput = inputs["text_inputs"]
@@ -148,13 +148,3 @@ def image_style_transfer(inputs: ImageInput, parameters: ImageParameters) -> Res
 
 # Run the server (optional. You can also run the server using the command line)
 server.run()
-
-# Expected request json format:
-# {
-#     "inputs": [
-#         {"text": "Text to be classified"},
-#         {"text": "Another text to be classified"}
-#     ],
-#     "data_type": "TEXT",
-#     "parameters": {}
-# }
