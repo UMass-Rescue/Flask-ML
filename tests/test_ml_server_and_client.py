@@ -102,6 +102,10 @@ def app():
     @server.route("/process_files")
     def server_process_images(inputs: FileInputs, parameters: FloatParameters) -> ResponseBody:
         return ResponseBody(root=process_files(inputs["file_inputs"].files, parameters))
+    
+    @server.route("/process_invalid")
+    def server_process_invalid(inputs: FileInputs, parameters: FloatParameters) -> ResponseBody:
+        raise Exception("Internal Server Error")
 
     def get_task_schema(inputSchema: InputSchema, parameterSchema: ParameterSchema):
         return lambda: TaskSchema(
@@ -128,6 +132,10 @@ def app():
     )
     def server_process_images_with_schema(inputs: FileInputs, parameters: FloatParameters) -> ResponseBody:
         return ResponseBody(root=process_files(inputs["file_inputs"].files, parameters))
+
+    @server.route("/process_invalid_with_schema", get_task_schema(BATCHFILE_INPUT_SCHEMA, RANGED_FLOAT_PARAM_SCHEMA))
+    def server_process_invalid_with_schema(inputs: FileInputs, parameters: FloatParameters) -> ResponseBody:
+        raise Exception("Internal Server Error")
 
     return server.app.test_client()
 
@@ -162,6 +170,11 @@ def test_list_routes(app):
             "sample_payload": "/process_files/sample_payload",
         },
         {
+            "payload_schema": "/process_invalid/payload_schema",
+            "run_task": "/process_invalid",
+            "sample_payload": "/process_invalid/sample_payload",
+        },
+        {
             "order": 0,
             "payload_schema": "/process_text_with_schema/payload_schema",
             "run_task": "/process_text_with_schema",
@@ -192,6 +205,14 @@ def test_list_routes(app):
             "sample_payload": "/process_files_with_schema/sample_payload",
             "short_title": "",
             "task_schema": "/process_files_with_schema/task_schema",
+        },
+        {
+            "order": 0,
+            "payload_schema": "/process_invalid_with_schema/payload_schema",
+            "run_task": "/process_invalid_with_schema",
+            "sample_payload": "/process_invalid_with_schema/sample_payload",
+            "short_title": "",
+            "task_schema": "/process_invalid_with_schema/task_schema",
         }
     ]
 
@@ -429,7 +450,7 @@ def test_invalid_reponse_not_json(mock_post, client):
 
 
 @patch("requests.post")
-def test_non_200_reponse(mock_post, client):
+def test_400_reponse(mock_post, client):
     data = {
         "inputs": {"file_inputs": {"files": [{"path": "/path/to/image.jpg"}]}},
         "parameters": {"param1": 0.0},
@@ -440,6 +461,19 @@ def test_non_200_reponse(mock_post, client):
     mock_post.return_value.status_code = 400
     response = client.request(data["inputs"], data["parameters"])
     assert {"status": "failed"} == response
+
+@patch("requests.post")
+def test_500_reponse(mock_post, client):
+    data = {
+        "inputs": {"file_inputs": {"files": [{"path": "/path/to/image.jpg"}]}},
+        "parameters": {"param1": 0.0},
+    }
+    mock_post.return_value = MockResponse(
+        response=Response(response=json.dumps({"status": "internal server error"}), status=500, mimetype="application/json")
+    )
+    mock_post.return_value.status_code = 500
+    response = client.request(data["inputs"], data["parameters"])
+    assert {"status": "internal server error"} == response
 
 
 def test_invalid_file_request(app):
@@ -452,3 +486,21 @@ def test_invalid_file_request(app):
     assert response.status_code == 400
     assert "VALIDATION_ERROR" == response.json["status"]
     assert "Field required" == response.json["error"][0]["msg"]
+
+def test_500_error_handling_for_endpoint_without_schema(app):
+    data = {
+        "inputs": {"file_inputs": {"files": [{"path": "/path/to/image.jpg"}]}},
+        "parameters": {"param1": 0.0},
+    }
+    response = app.post("/process_invalid", json=data)
+    assert response.status_code == 500
+    assert response.json == {'status': "SERVER_ERROR", 'error': "Exception('Internal Server Error')"}
+
+def test_500_error_handling_for_endpoint_with_schema(app):
+    data = {
+        "inputs": {"file_inputs": {"files": [{"path": "/path/to/image.jpg"}]}},
+        "parameters": {"param1": 0.0},
+    }
+    response = app.post("/process_invalid_with_schema", json=data)
+    assert response.status_code == 500
+    assert response.json == {'status': "SERVER_ERROR", 'error': "Exception('Internal Server Error')"}
