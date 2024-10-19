@@ -131,8 +131,6 @@ def test_schema_get_parameters_on_invalid_data():
 def test_schema_get_sample_payload_on_valid_input(input_schema, expected_inputs):
     task_schema = TaskSchema(inputs=[input_schema], parameters=[])
     result = schema_get_sample_payload(task_schema)
-    print(result)
-    print(RequestBody(inputs=expected_inputs, parameters={}))
     assert result == RequestBody(inputs=expected_inputs, parameters={})
 
 @pytest.mark.parametrize("parameter_schema, expected_parameters", [
