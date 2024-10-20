@@ -17,7 +17,7 @@ By the end of this tutorial, you will be able to:
 - Create a Flask-ML server
 - Define inputs and outputs for your machine learning code
 - Write type-safe Python code
-- Expose a UI schema for your machine learning model
+- Expose a UI schema for your machine learning code
 
 ## Tutorial
 
@@ -127,7 +127,7 @@ Now, let's implement the model:
 
 ```python
 from typing import TypedDict
-from flask_ml.flask_ml_server.models import BatchTextInput, ResponseBody, BatchTextResponse
+from flask_ml.flask_ml_server.models import BatchTextInput, ResponseBody, BatchTextResponse, TextResponse
 
 class TransformCaseInputs(TypedDict):
     text_inputs: BatchTextInput
@@ -376,7 +376,7 @@ Note that calling the `/transform_case/task_schema` route simply executes the Ta
 ```python
 from typing import TypedDict
 from flask_ml.flask_ml_server import MLServer
-from flask_ml.flask_ml_server.models import *
+from flask_ml.flask_ml_server.models import BatchTextInput, BatchTextResponse, EnumParameterDescriptor, EnumVal, InputSchema, InputType, ParameterSchema, ResponseBody, TaskSchema, TextResponse
 
 server = MLServer(__name__)
 
@@ -434,4 +434,5 @@ def transform_case(inputs: TransformCaseInputs, parameters: TransformCaseParamet
 
 # Run a debug server
 server.run()
+
 ```
