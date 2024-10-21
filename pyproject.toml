@@ -4,13 +4,16 @@ build-backend = "hatchling.build"
 
 [project]
 name = "flask_ml"
-version = "0.1.1"
+version = "0.2.0"
 authors = [
   { name="Prasanna Lakkur Subramanyam", email="psubramanyam@umass.edu" },
+  { name="Atharva Kale", email="aukale@umass.edu" },
+  { name="Shreyan Mallik", email="smallik@umass.edu" },
+  { name="Shriram Giridhara", email="sgiridhara@umass.edu" }
 ]
 description = "A Flask extension for running machine learning code"
 readme = "README.md"
-requires-python = ">=3.3"
+requires-python = ">=3.10"
 classifiers = [
     "Environment :: Web Environment",
     "Intended Audience :: Developers",
@@ -22,7 +25,8 @@ classifiers = [
 dependencies = [
     "Flask",
     "requests",
-    "pydantic"
+    "pydantic",
+    "datamodel-code-generator"
 ]
 
 [project.optional-dependencies]
@@ -32,8 +36,29 @@ dev = [
     "flake8",
     "mypy",
     "types-requests",
-    "pytest"
+    "pytest",
+    "pytest-cov",
+    "autoflake8"
 ]
 
 [project.urls]
 Homepage = "https://github.com/UMass-Rescue/Flask-ML"
+
+[tool.datamodel-codegen]
+field-constraints = true
+snake-case-field = true
+strip-default-none = false
+target-python-version = "3.10"
+use-annotated = true
+capitalize-enum-members = true
+set-default-enum-member = true
+use-default = true
+output-model-type = "pydantic_v2.BaseModel"
+allow-population-by-field-name = true
+
+[tool.black]
+line-length = 110
+
+
+[tool.isort]
+profile = "black"
