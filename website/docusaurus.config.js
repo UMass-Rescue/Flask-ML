@@ -12,10 +12,10 @@ const config = {
   tagline: "A Flask extension for running machine learning code",
 
   // Set the production url of your site here
-  url: "https://atharvakale343.github.io/Flask-ML/",
+  url: "https://atharvakale343.github.io/",
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: "/",
+  baseUrl: "/Flask-ML",
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
