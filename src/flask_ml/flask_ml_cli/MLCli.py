@@ -22,8 +22,8 @@ from flask_ml.flask_ml_server.models import (
     ResponseBody,
     TaskSchema,
     TextInput,
+    EnumParameterDescriptor,
 )
-from flask_ml.flask_ml_server.utils import schema_get_inputs, schema_get_parameters
 
 
 def get_input_argument_validator_func(input_type: InputType):
@@ -64,6 +64,11 @@ def get_parameter_argument_validator_func(parameter_type: ParameterType):
             assert_never(parameter_type)
 
 
+def get_enum_parameter_choices(parameter_schema: ParameterSchema):
+    assert isinstance(parameter_schema.value, EnumParameterDescriptor)
+    return [item.key for item in parameter_schema.value.enum_vals]
+
+
 class MLCli:
     def __init__(self, server: MLServer, argument_parser: ArgumentParser, verbose=False):
         self._server = server
@@ -80,7 +85,7 @@ class MLCli:
         name = "--" + input_schema.key
         help = input_schema.subtitle if input_schema.subtitle else input_schema.label
         input_type = input_schema.input_type
-        
+
         # Figure out if inputs could be one or more values
         nargs = None
         if input_type in [InputType.BATCHFILE, InputType.BATCHDIRECTORY, InputType.BATCHTEXT]:
@@ -104,6 +109,11 @@ class MLCli:
                 help=help,
                 default=default_param_value,
                 type=get_parameter_argument_validator_func(parameter_type),
+                choices=(
+                    get_enum_parameter_choices(parameter_schema)
+                    if parameter_type == ParameterType.ENUM
+                    else None
+                ),
             )
         else:
             parser.add_argument(

@@ -83,5 +83,6 @@ options:
   -h, --help            show this help message and exit
   --text_inputs TEXT_INPUTS [TEXT_INPUTS ...]
                         Text to Transform
-  --to_case TO_CASE     'upper' will convert all text to upper case. 'lower' will convert all text to lower case.
+  --to_case {upper,lower}
+                        'upper' will convert all text to upper case. 'lower' will convert all text to lower case.
 ```
