@@ -55,8 +55,33 @@ if __name__ == "__main__":
     main()
 ```
 
+## Running the CLI
+
 That's it! Now, you can run your CLI with:
 
 ```bash
 python cli.py
+```
+
+```
+$ python simple_cli.py --help
+usage: simple_cli.py [-h] {transform_case} ...
+
+Transform Case of multiple text inputs
+
+positional arguments:
+  {transform_case}  Subcommands
+    transform_case  Transform Case
+
+options:
+  -h, --help        show this help message and exit
+
+$ python simple_cli.py transform_case --help
+usage: simple_cli.py transform_case [-h] --text_inputs TEXT_INPUTS [TEXT_INPUTS ...] [--to_case TO_CASE]
+
+options:
+  -h, --help            show this help message and exit
+  --text_inputs TEXT_INPUTS [TEXT_INPUTS ...]
+                        Text to Transform
+  --to_case TO_CASE     'upper' will convert all text to upper case. 'lower' will convert all text to lower case.
 ```
