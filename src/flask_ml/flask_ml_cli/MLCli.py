@@ -1,7 +1,6 @@
 from argparse import ArgumentParser
-from email.policy import default
 import json
-from typing import Callable, Text
+from typing import Callable
 from typing_extensions import assert_never
 
 from flask_ml.flask_ml_cli.utils import (
@@ -75,15 +74,17 @@ class MLCli:
         self._parser = argument_parser
         self._verbose = verbose
 
-    def _get_name_of_subcommand(self, endpoint: EndpointDetails):
+    @staticmethod
+    def _get_name_of_subcommand(endpoint: EndpointDetails):
         rule = endpoint.rule
         if rule.startswith("/"):
             rule = rule[1:]
         return rule.replace("/", "_")
 
-    def _add_input_argument_to_parser(self, parser: ArgumentParser, input_schema: InputSchema):
+    @staticmethod
+    def _add_input_argument_to_parser(parser: ArgumentParser, input_schema: InputSchema):
         name = "--" + input_schema.key
-        help = input_schema.subtitle if input_schema.subtitle else input_schema.label
+        helpp = input_schema.subtitle if input_schema.subtitle else input_schema.label
         input_type = input_schema.input_type
 
         # Figure out if inputs could be one or more values
@@ -92,12 +93,13 @@ class MLCli:
             nargs = "+"
 
         parser.add_argument(
-            name, help=help, required=True, type=get_input_argument_validator_func(input_type), nargs=nargs
+            name, help=helpp, required=True, type=get_input_argument_validator_func(input_type), nargs=nargs
         )
 
-    def _add_parameter_argument_to_parser(self, parser: ArgumentParser, parameter_schema: ParameterSchema):
+    @staticmethod
+    def _add_parameter_argument_to_parser(parser: ArgumentParser, parameter_schema: ParameterSchema):
         name = "--" + parameter_schema.key
-        help = parameter_schema.subtitle if parameter_schema.subtitle else parameter_schema.label
+        helpp = parameter_schema.subtitle if parameter_schema.subtitle else parameter_schema.label
         parameter_type = parameter_schema.value.parameter_type
         if parameter_type is None:
             raise ValueError("FATAL: Parameter type must never be None")
@@ -106,7 +108,7 @@ class MLCli:
         if default_param_value is not None:
             parser.add_argument(
                 name,
-                help=help,
+                help=helpp,
                 default=default_param_value,
                 type=get_parameter_argument_validator_func(parameter_type),
                 choices=(
@@ -117,10 +119,11 @@ class MLCli:
             )
         else:
             parser.add_argument(
-                name, help=help, required=True, type=get_parameter_argument_validator_func(parameter_type)
+                name, help=helpp, required=True, type=get_parameter_argument_validator_func(parameter_type)
             )
 
-    def _set_function_on_parser(self, parser, task_schema: TaskSchema, ml_func: Callable[..., ResponseBody]):
+    @staticmethod
+    def _set_function_on_parser(parser, task_schema: TaskSchema, ml_func: Callable[..., ResponseBody]):
         def func(args):
             inputs = {}
             parameters = {}
@@ -155,14 +158,14 @@ class MLCli:
 
     def _add_subparser(self, subparsers, endpoint: EndpointDetails):
         name = self._get_name_of_subcommand(endpoint)
-        help = endpoint.short_title
+        helpp = endpoint.short_title
 
         task_schema = endpoint.task_schema_func()
 
         input_schemas = task_schema.inputs
         parameter_schemas = task_schema.parameters
 
-        subcommand_parser = subparsers.add_parser(name, help=help)
+        subcommand_parser = subparsers.add_parser(name, help=helpp)
 
         for input_schema in input_schemas:
             self._add_input_argument_to_parser(subcommand_parser, input_schema)
