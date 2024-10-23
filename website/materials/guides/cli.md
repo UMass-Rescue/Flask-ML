@@ -33,7 +33,7 @@ if __name__ == "__main__":
 
 ## CLI File
 
-Create a new file called `cli.py` in your project directory.
+Create a new file called `cli.py` in your project directory, and import your MLServer instance into it.
 
 ```python
 # cli.py
