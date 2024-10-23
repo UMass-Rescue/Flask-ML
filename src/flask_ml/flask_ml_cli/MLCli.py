@@ -1,4 +1,4 @@
-from argparse import _SubParsersAction, ArgumentParser
+from argparse import ArgumentParser
 from email.policy import default
 import json
 from typing import Callable, Text
@@ -153,7 +153,7 @@ class MLCli:
 
         parser.set_defaults(func=func)
 
-    def _add_subparser(self, subparsers: _SubParsersAction, endpoint: EndpointDetails):
+    def _add_subparser(self, subparsers, endpoint: EndpointDetails):
         name = self._get_name_of_subcommand(endpoint)
         help = endpoint.short_title
 
