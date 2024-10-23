@@ -307,7 +307,7 @@ Let's write a parameter schema for our function's parameters:
 parameterSchema = ParameterSchema(
     key="to_case",
     label="Case to Transform Text Into",
-    subtitle="UPPER will convert all text to upper case. LOWER will convert all text to lower case.",
+    subtitle="'upper' will convert all text to upper case. 'lower' will convert all text to lower case.",
     value=EnumParameterDescriptor(
         enum_vals=[
             EnumVal(
@@ -395,7 +395,7 @@ def create_transform_case_task_schema() -> TaskSchema:
     parameterSchema = ParameterSchema(
         key="to_case",
         label="Case to Transform Text Into",
-        subtitle="UPPER will convert all text to upper case. LOWER will convert all text to lower case.",
+        subtitle="'upper' will convert all text to upper case. 'lower' will convert all text to lower case.",
         value=EnumParameterDescriptor(
             enum_vals=[
                 EnumVal(
@@ -432,7 +432,8 @@ def transform_case(inputs: TransformCaseInputs, parameters: TransformCaseParamet
 
     return ResponseBody(root=BatchTextResponse(texts=outputs))
 
-# Run a debug server
-server.run()
+if __name__ == "__main__":
+    # Run a debug server
+    server.run()
 
 ```
