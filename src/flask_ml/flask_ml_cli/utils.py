@@ -1,6 +1,8 @@
 import os, tempfile
 import errno, sys
-from typing import Any, List
+from typing import Any, Callable
+import argparse
+from flask_ml.flask_ml_server.models import FloatRangeDescriptor, IntRangeDescriptor
 
 
 def is_dir_path(path: str) -> bool:
@@ -154,3 +156,25 @@ def is_path_exists_or_creatable_portable_arg_parser(path: str) -> str:
         return path
     else:
         raise ValueError(f"{path} is not a valid path")
+
+def get_int_range_check_func_arg_parser(range: IntRangeDescriptor) -> Callable[[Any], int]:
+    def check_func(value: Any) -> int:
+        try:
+            value = int(value)
+        except:
+            raise argparse.ArgumentTypeError(f"{value} is not a valid integer")
+        if value < range.min or value > range.max:
+            raise argparse.ArgumentTypeError(f"{value} is not in the range [{range.min}, {range.max}]")
+        return value
+    return check_func
+
+def get_float_range_check_func_arg_parser(range: FloatRangeDescriptor) -> Callable[[Any], float]:
+    def check_func(value: Any) -> float:
+        try:
+            value = float(value)
+        except:
+            raise argparse.ArgumentTypeError(f"{value} is not a valid float")
+        if value < range.min or value > range.max:
+            raise argparse.ArgumentTypeError(f"{value} is not in the range [{range.min}, {range.max}]")
+        return value
+    return check_func

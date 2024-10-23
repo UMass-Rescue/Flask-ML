@@ -4,6 +4,8 @@ from typing import Callable
 from typing_extensions import assert_never
 
 from flask_ml.flask_ml_cli.utils import (
+    get_float_range_check_func_arg_parser,
+    get_int_range_check_func_arg_parser,
     is_path_exists_or_creatable_portable_arg_parser,
 )
 from flask_ml.flask_ml_server import MLServer
@@ -14,14 +16,19 @@ from flask_ml.flask_ml_server.models import (
     BatchTextInput,
     DirectoryInput,
     FileInput,
+    FloatParameterDescriptor,
     InputSchema,
     InputType,
+    IntParameterDescriptor,
     ParameterSchema,
     ParameterType,
+    RangedFloatParameterDescriptor,
+    RangedIntParameterDescriptor,
     ResponseBody,
     TaskSchema,
     TextInput,
     EnumParameterDescriptor,
+    TextParameterDescriptor,
 )
 
 
@@ -45,22 +52,22 @@ def get_input_argument_validator_func(input_type: InputType):
             assert_never(input_type)
 
 
-def get_parameter_argument_validator_func(parameter_type: ParameterType):
-    match parameter_type:
-        case ParameterType.RANGED_FLOAT:
+def get_parameter_argument_validator_func(parameter_schema: ParameterSchema):
+    match parameter_schema.value:
+        case RangedFloatParameterDescriptor():
+            return get_float_range_check_func_arg_parser(parameter_schema.value.range)
+        case FloatParameterDescriptor():
             return float
-        case ParameterType.FLOAT:
-            return float
-        case ParameterType.ENUM:
+        case EnumParameterDescriptor():
             return str
-        case ParameterType.TEXT:
+        case TextParameterDescriptor():
             return str
-        case ParameterType.RANGED_INT:
-            return int
-        case ParameterType.INT:
+        case RangedIntParameterDescriptor():
+            return get_int_range_check_func_arg_parser(parameter_schema.value.range)
+        case IntParameterDescriptor():
             return int
         case _:
-            assert_never(parameter_type)
+            assert_never(parameter_schema.value)
 
 
 def get_enum_parameter_choices(parameter_schema: ParameterSchema):
@@ -110,7 +117,7 @@ class MLCli:
                 name,
                 help=helpp,
                 default=default_param_value,
-                type=get_parameter_argument_validator_func(parameter_type),
+                type=get_parameter_argument_validator_func(parameter_schema),
                 choices=(
                     get_enum_parameter_choices(parameter_schema)
                     if parameter_type == ParameterType.ENUM
@@ -119,7 +126,7 @@ class MLCli:
             )
         else:
             parser.add_argument(
-                name, help=helpp, required=True, type=get_parameter_argument_validator_func(parameter_type)
+                name, help=helpp, required=True, type=get_parameter_argument_validator_func(parameter_schema)
             )
 
     @staticmethod
