@@ -44,7 +44,7 @@ class FileML:
         self.input_type = FileInputs
         self.parameters = parameters
         parameter_types = parameters_to_types(parameters)
-        self.parameter_type = TypedDict('FileMLParameters', parameter_types)
+        self.parameter_type = TypedDict('FileMLParameters', parameter_types)  # type: ignore
         self.task_schema_func = self.file_ml_task_schema
     
     def file_ml_task_schema(self) -> models.TaskSchema:
@@ -66,7 +66,7 @@ class TextML:
         self.input_type = TextInputs
         self.parameters = parameters
         parameter_types = parameters_to_types(parameters)
-        self.parameter_type = TypedDict('TextMLParameters', parameter_types)
+        self.parameter_type = TypedDict('TextMLParameters', parameter_types)  # type: ignore
         self.task_schema_func = self.text_ml_task_schema
     
     def text_ml_task_schema(self) -> models.TaskSchema:
