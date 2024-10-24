@@ -387,12 +387,12 @@ class TransformCaseParameters(TypedDict):
     to_case: str # 'upper' or 'lower'
 
 def create_transform_case_task_schema() -> TaskSchema:
-    inputSchema = InputSchema(
+    input_schema = InputSchema(
         key="text_inputs",
         label="Text to Transform",
         input_type=InputType.BATCHTEXT
     )
-    parameterSchema = ParameterSchema(
+    parameter_schema = ParameterSchema(
         key="to_case",
         label="Case to Transform Text Into",
         subtitle="'upper' will convert all text to upper case. 'lower' will convert all text to lower case.",
@@ -411,8 +411,8 @@ def create_transform_case_task_schema() -> TaskSchema:
         )
     )
     return TaskSchema(
-        inputs = [inputSchema],
-        parameters = [parameterSchema]
+        inputs = [input_schema],
+        parameters = [parameter_schema]
     )
 
 @server.route(
