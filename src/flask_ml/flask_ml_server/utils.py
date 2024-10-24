@@ -60,7 +60,7 @@ def input_from_data(input_type: InputType, data: Dict[str, Any]):
             return BatchTextInput(**data)
         case InputType.BATCHDIRECTORY:
             return BatchDirectoryInput(**data)
-        case _:
+        case _: # pragma: no cover
             assert_never(input_type)
 
 
@@ -137,7 +137,7 @@ def schema_get_sample_payload(schema: TaskSchema) -> RequestBody:
                         ]
                     )
                 )
-            case _:
+            case _: # pragma: no cover
                 assert_never(input_type)
     for parameter_schema in parameter_schema:
         match parameter_schema.value:
@@ -153,7 +153,7 @@ def schema_get_sample_payload(schema: TaskSchema) -> RequestBody:
                 parameters[parameter_schema.key] = parameter_schema.value.range.min
             case IntParameterDescriptor():
                 parameters[parameter_schema.key] = parameter_schema.value.default
-            case _:
+            case _: # pragma: no cover
                 assert_never(parameter_schema.value)
     return RequestBody(inputs=inputs, parameters=parameters)
 
@@ -194,7 +194,7 @@ def resolve_input_sample(input_type: Any) -> Input:
                     ]
                 )
             )
-        case _:
+        case _: # pragma: no cover
             assert_never(input_type)
 
 
@@ -264,7 +264,7 @@ def ensure_ml_func_hinting_and_task_schemas_are_valid(
                 assert (
                     input_type_hint is BatchDirectoryInput
                 ), f"For key {key}, the input type is InputType.BATCHDIRECTORY, but the TypeDict hint is {input_type_hint}. Change to BatchDirectoryInput."
-            case _:
+            case _: # pragma: no cover
                 assert_never(input_type)
 
     for key in parameters_schema_key_to_parameter_type:
@@ -295,7 +295,7 @@ def ensure_ml_func_hinting_and_task_schemas_are_valid(
                 assert (
                     parameter_type_hint is int
                 ), f"For key {key}, the parameter type is ParameterType.INT, but the TypeDict hint is {parameter_type_hint}. Change to int."
-            case _:
+            case _: # pragma: no cover
                 assert_never(parameter_type)
 
 

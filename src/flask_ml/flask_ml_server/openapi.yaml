@@ -426,7 +426,7 @@ components:
 
     DirectoryResponse:
       type: object
-      required: [output_type, path, title, subtitle]
+      required: [output_type, path, title]
       discriminator:
         propertyName: output_type
       properties:
