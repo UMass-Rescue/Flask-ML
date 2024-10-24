@@ -41,10 +41,10 @@ def generate_text_response(predictions: Dict[str, str]) -> models.ResponseBody:
 
 class FileML:
     def __init__(self, parameters: Dict={}):
-        self.input_type = FileInputs
+        self.InputType = FileInputs
         self.parameters = parameters
         parameter_types = parameters_to_types(parameters)
-        self.parameter_type = TypedDict('FileMLParameters', parameter_types)  # type: ignore
+        self.ParameterType = TypedDict('FileMLParameters', parameter_types)  # type: ignore
         self.task_schema_func = self.file_ml_task_schema
     
     def file_ml_task_schema(self) -> models.TaskSchema:
@@ -63,10 +63,10 @@ class FileML:
 
 class TextML:
     def __init__(self, parameters: Dict={}):
-        self.input_type = TextInputs
+        self.InputType = TextInputs
         self.parameters = parameters
         parameter_types = parameters_to_types(parameters)
-        self.parameter_type = TypedDict('TextMLParameters', parameter_types)  # type: ignore
+        self.ParameterType = TypedDict('TextMLParameters', parameter_types)  # type: ignore
         self.task_schema_func = self.text_ml_task_schema
     
     def text_ml_task_schema(self) -> models.TaskSchema:
