@@ -1,3 +1,9 @@
+# Prerequisites
+
+ffmpeg must be installed on your system.
+
+Download: https://www.ffmpeg.org/download.html
+
 # Running the CLI
 
 ```bash
