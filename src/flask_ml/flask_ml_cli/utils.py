@@ -139,6 +139,12 @@ def is_path_exists_or_creatable_portable_arg_parser(path: str) -> str:
     else:
         raise ValueError(f"{path} is not a valid path")
 
+def is_pathname_valid_arg_parser(pathname: str) -> str:
+    if is_pathname_valid(pathname):
+        return pathname
+    else:
+        raise ValueError(f"{pathname} is not a valid pathname")
+
 def get_int_range_check_func_arg_parser(range: IntRangeDescriptor) -> Callable[[Any], int]:
     def check_func(value: Any) -> int:
         try:
