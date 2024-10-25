@@ -60,6 +60,10 @@ followed by
 pip install -r tool-suite/audio-transcription/requirements.txt
 ```
 
+### Running a sample task
+
+Read the [README](./tool-suite/audio-transcription/README.md) in the tool-suite/audio-transcription directory for instructions on how to run the sample task.
+
 ### Flask-ML
 
 This repository already contains a copy of the Python library [FlaskML](umass-rescue.github.io/Flask-ML/). Check out the website for more examples and usage documentation: https://umass-rescue.github.io/Flask-ML/
