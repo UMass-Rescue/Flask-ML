@@ -16,7 +16,7 @@ pip install flask-ml
 
 #### Server
 
-Refer server_example.py
+Refer simple_server.py, more_server_examples.py, and simple_cli.py
 
 #### Client
 
