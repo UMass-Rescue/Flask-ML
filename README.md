@@ -32,8 +32,16 @@ This uses `venv` to create a new virutal envrionment for you.
 
 ### Activate the virtual envrionment
 
+For MacOS:
+
 ```bash
 source env/bin/activate
+```
+
+For Windows:
+
+```pwsh
+.\env\Scripts\Activate.ps1
 ```
 
 ### Installing dependencies
