@@ -6,7 +6,7 @@ from typing_extensions import assert_never
 from flask_ml.flask_ml_cli.utils import (
     get_float_range_check_func_arg_parser,
     get_int_range_check_func_arg_parser,
-    is_path_exists_or_creatable_portable_arg_parser,
+    is_pathname_valid_arg_parser,
 )
 from flask_ml.flask_ml_server import MLServer
 from flask_ml.flask_ml_server.MLServer import EndpointDetails
@@ -41,20 +41,10 @@ from flask_ml.flask_ml_server.models import (
 
 def get_input_argument_validator_func(input_type: InputType):
     match input_type:
-        case InputType.FILE:
-            return is_path_exists_or_creatable_portable_arg_parser
-        case InputType.DIRECTORY:
-            return is_path_exists_or_creatable_portable_arg_parser
-        case InputType.TEXT:
+        case InputType.FILE | InputType.DIRECTORY | InputType.BATCHFILE | InputType.BATCHDIRECTORY:
+            return is_pathname_valid_arg_parser
+        case InputType.TEXT | InputType.BATCHTEXT | InputType.TEXTAREA:
             return str
-        case InputType.TEXTAREA:
-            return str
-        case InputType.BATCHFILE:
-            return is_path_exists_or_creatable_portable_arg_parser
-        case InputType.BATCHTEXT:
-            return str
-        case InputType.BATCHDIRECTORY:
-            return is_path_exists_or_creatable_portable_arg_parser
         case _:  # pragma: no cover
             assert_never(input_type)
 
