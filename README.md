@@ -28,9 +28,9 @@ When you're done, submit a PR back to this repository, so we can have everyone's
 python -m venv env
 ```
 
-This uses `venv` to create a new virutal envrionment for you.
+This uses `venv` to create a new virtual environment for you.
 
-### Activate the virtual envrionment
+### Activate the virtual environment
 
 ```bash
 source env/bin/activate
