@@ -46,7 +46,7 @@ For Windows:
 
 ### Installing dependencies
 
-Create a `requirements.txt` under your tool. For example, `tool-suite/deep-fake-classification/requirements.txt`
+Create a `requirements.txt` under your tool. For example, `tool-suite/audio-transcription/requirements.txt`
 
 Then, run
 
@@ -57,7 +57,7 @@ pip install -e ".[dev]"
 followed by
 
 ```bash
-pip install -r tool-suite/deep-fake-classification/requirements.txt
+pip install -r tool-suite/audio-transcription/requirements.txt
 ```
 
 ### Flask-ML
