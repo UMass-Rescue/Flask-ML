@@ -42,12 +42,11 @@ import argparse
 
 from flask_ml.flask_ml_cli import MLCli
 from server import ml_server
-from small_blk_forensics.backend.server import server
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Transform Case of multiple text inputs")
-    cli = MLCli(server, parser)
+    parser = argparse.ArgumentParser(description="<Enter a description of your tool here>")
+    cli = MLCli(ml_server, parser)
     cli.run_cli()
 
 
@@ -60,7 +59,7 @@ if __name__ == "__main__":
 That's it! Now, you can run your CLI with:
 
 ```bash
-python cli.py
+python -m cli
 ```
 
 ```

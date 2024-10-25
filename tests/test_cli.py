@@ -3,6 +3,8 @@ from flask_ml.flask_ml_cli import MLCli
 from flask_ml.flask_ml_server import MLServer
 import pytest
 
+from flask_ml.flask_ml_server.models import MarkdownResponse, ResponseBody
+
 
 @pytest.fixture
 def ml_cli(server: MLServer):
@@ -316,3 +318,16 @@ def test_process_directories_and_ranged_int_parameter_with_schema_non_int_parame
             ]
         )
         ml_cli._run_cli_and_return(parsed_args)
+
+def test_print_markdown_response(ml_cli: MLCli):
+    ml_cli._print_response_body(
+        ResponseBody(
+            root=MarkdownResponse(
+                title="Markdown Title",
+                subtitle="Markdown Subtitle",
+                value=f"""
+        # Markdown Content
+        """,
+            )
+        )
+    )
