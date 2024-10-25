@@ -1,0 +1,7 @@
+Name: Audio Transcription
+Slug: audio-transcription
+Description: A tool to transcribe a given audio file
+Usage:
+  - transcribe: python -m tool-suite.audio-transcription.cli transcribe --audio_files <path to file>
+Example:
+  - transcribe: python -m tool-suite.audio-transcription.cli transcribe --audio_files tool-suite/audio-transcription/audio_files/news.mp3
