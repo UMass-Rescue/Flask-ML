@@ -41,20 +41,10 @@ from flask_ml.flask_ml_server.models import (
 
 def get_input_argument_validator_func(input_type: InputType):
     match input_type:
-        case InputType.FILE:
+        case InputType.FILE | InputType.DIRECTORY | InputType.BATCHFILE | InputType.BATCHDIRECTORY:
             return is_pathname_valid_arg_parser
-        case InputType.DIRECTORY:
-            return is_pathname_valid_arg_parser
-        case InputType.TEXT:
+        case InputType.TEXT | InputType.BATCHTEXT | InputType.TEXTAREA:
             return str
-        case InputType.TEXTAREA:
-            return str
-        case InputType.BATCHFILE:
-            return is_pathname_valid_arg_parser
-        case InputType.BATCHTEXT:
-            return str
-        case InputType.BATCHDIRECTORY:
-            return is_pathname_valid_arg_parser
         case _:  # pragma: no cover
             assert_never(input_type)
 
