@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "flask_ml"
-version = "0.2.2"
+version = "0.2.4"
 authors = [
   { name="Prasanna Lakkur Subramanyam", email="psubramanyam@umass.edu" },
   { name="Atharva Kale", email="aukale@umass.edu" },
