@@ -4,6 +4,8 @@ ffmpeg must be installed on your system.
 
 Download: https://www.ffmpeg.org/download.html
 
+If you don't have it installed, install it and restart the terminal.
+
 # Running the CLI
 
 ```bash
