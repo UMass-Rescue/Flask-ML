@@ -12,9 +12,13 @@ Begin by forking this repository to your GitHub account.
 
 Under the directory `tool-suite`, create a directory for your project. For example, this could be `tool-suite/deep-fake-classification`.
 
-### Start Hacking!
+### Step 3: Start Hacking!
 
-See the development section for more help on project setup.
+See the [development](#development) section for more help on project setup.
+
+### Step 4: Submit a PR back to this repository
+
+When you're done, submit a PR back to this repository, so we can have everyone's tools ready to go!
 
 ## Development
 
