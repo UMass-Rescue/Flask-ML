@@ -24,10 +24,8 @@ server.add_app_metadata(AppMetadata(
 ))
 ```
 
-Here, info is a Markdown string that contains an overview of your application. See [Sample Application Info](../../../simple_server_info.md) for an example.
+Here, info is a Markdown string that contains an overview of your application. See [Sample Application Info](https://github.com/UMass-Rescue/Flask-ML/blob/master/simple_server_info.md) for an example.
 
-This creates a new route at `/api/app_metadata` that returns the metadata as a JSON object. This will be used by Rescue-Box Desktop to display it here:
+This creates a new route at `/api/app_metadata` that returns the metadata as a JSON object. This will be used by [Rescue-Box Desktop](https://github.com/UMass-Rescue/RescueBox-Desktop) to display it here:
 
-<p align="center">
-  <img src="/img/sample_markdown_app_metadata.png" />
-</p>
+![](/img/sample_markdown_app_metadata.png)
