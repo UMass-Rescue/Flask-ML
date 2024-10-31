@@ -1,19 +1,20 @@
+
 openapi: 3.0.0
 info:
   title: FlaskML
   version: 1.0.0
   description: API for processing machine learning inputs and returning results.
 paths:
-  /info:
+  /api/app_metadata:
     get:
-      summary: Get Info Page
+      summary: Get App Metadata
       responses:
         '200':
-          description: Info page rendered in markdown
+          description: App metadata
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InfoPage'
+                $ref: '#/components/schemas/AppMetadata'
 
   /api/routes:
     get:
@@ -86,9 +87,9 @@ paths:
 components:
   schemas:
     # Info Page models
-    InfoPage:
+    AppMetadata:
       type: object
-      required: [info, author, version, lastUpdated]
+      required: [info, name, author, version]
       properties:
         info:
           type: string
@@ -97,9 +98,9 @@ components:
           type: string
         version:
           type: string
-        lastUpdated:
+        name:
           type: string
-          format: date-time
+          example: "Face Match App"
       example:
         info: "# Welcome to the Face Match App\n\nThis app will help you to match faces in your images..."
 

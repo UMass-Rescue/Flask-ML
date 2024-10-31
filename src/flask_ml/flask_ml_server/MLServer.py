@@ -17,6 +17,7 @@ from flask_ml.flask_ml_server.models import (
     ResponseBody,
     SchemaAPIRoute,
     TaskSchema,
+    AppMetadata
 )
 from flask_ml.flask_ml_server.utils import (
     ensure_ml_func_hinting_and_task_schemas_are_valid,
@@ -60,6 +61,7 @@ class MLServer(object):
         """
         self.app = Flask(name, static_folder=None)
         self.endpoints: List[EndpointDetailsNoSchema] = []
+        self._app_metadata: Optional[AppMetadata] = None
 
         @self.app.route("/api/routes", methods=["GET"])
         def list_routes():
@@ -86,6 +88,15 @@ class MLServer(object):
                 for endpoint in self.endpoints
             ]
             return jsonify(APIRoutes(root=routes).model_dump(mode="json"))
+        
+        @self.app.route("/api/app_metadata", methods=["GET"])
+        def get_app_metadata():
+            if self._app_metadata is None:
+                return jsonify({"error": "App metadata not set"})
+            return jsonify(self._app_metadata.model_dump(mode="json"))
+
+    def add_app_metadata(self, app_metadata: AppMetadata):
+        self._app_metadata = app_metadata
 
     def route(
         self,
