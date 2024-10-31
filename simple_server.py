@@ -1,8 +1,15 @@
 from typing import TypedDict
-from flask_ml.flask_ml_server import MLServer
-from flask_ml.flask_ml_server.models import BatchTextInput, BatchTextResponse, EnumParameterDescriptor, EnumVal, InputSchema, InputType, ParameterSchema, ResponseBody, TaskSchema, TextResponse
+from flask_ml.flask_ml_server import MLServer, load_file_as_string
+from flask_ml.flask_ml_server.models import AppMetadata, BatchTextInput, BatchTextResponse, EnumParameterDescriptor, EnumVal, InputSchema, InputType, ParameterSchema, ResponseBody, TaskSchema, TextResponse
 
 server = MLServer(__name__)
+
+server.add_app_metadata(AppMetadata(
+    name="Simple Server - Transform Case",
+    author="Flask-ML Team",
+    version="0.1.0",
+    info=load_file_as_string("simple_server_info.md")
+))
 
 class TransformCaseInputs(TypedDict):
     text_inputs: BatchTextInput
