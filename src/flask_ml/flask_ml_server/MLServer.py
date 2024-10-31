@@ -95,8 +95,13 @@ class MLServer(object):
                 return jsonify({"error": "App metadata not set"})
             return jsonify(self._app_metadata.model_dump(mode="json"))
 
-    def add_app_metadata(self, app_metadata: AppMetadata):
-        self._app_metadata = app_metadata
+    def add_app_metadata(self, name: str, author: str, version: str, info: str):
+        self._app_metadata = AppMetadata(
+            name=name,
+            author=author,
+            version=version,
+            info=info
+        )
 
     def route(
         self,

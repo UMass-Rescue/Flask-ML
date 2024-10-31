@@ -4,8 +4,6 @@ from flask_ml.flask_ml_server import MLServer, load_file_as_string
 from flask.testing import FlaskClient
 import pytest
 
-from flask_ml.flask_ml_server.models import AppMetadata
-
 TEST_MARKDOWN_FILE_PATH = "test_markdown_file_path.md"
 TEST_MARKDOWN_FILE_CONTENT = "# This is a test markdown file"
 
@@ -19,12 +17,10 @@ def test_markdown_file_path(tmp_path: Path) -> str:
 
 def test_app_metadata_provided(server: MLServer, app: FlaskClient, test_markdown_file_path: str):
     server.add_app_metadata(
-        app_metadata=AppMetadata(
-            info=load_file_as_string(test_markdown_file_path),
-            author="Test Author",
-            version="1.0.0",
-            name="Test App",
-        )
+        info=load_file_as_string(test_markdown_file_path),
+        author="Test Author",
+        version="1.0.0",
+        name="Test App",
     )
 
     response = app.get("/api/app_metadata")
@@ -41,6 +37,7 @@ def test_app_metadata_not_provided(app: FlaskClient):
     response = app.get("/api/app_metadata")
     assert response.status_code == 200
     assert response.json == {"error": "App metadata not set"}
+
 
 def test_invalid_file_path():
     with pytest.raises(FileNotFoundError):
