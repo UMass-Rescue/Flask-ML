@@ -1,6 +1,6 @@
 from argparse import ArgumentParser, Namespace
 import json
-from typing import Callable, Optional, Sequence
+from typing import Callable, Optional, Sequence, Union
 from typing_extensions import assert_never
 
 from flask_ml.flask_ml_cli.utils import (
@@ -20,6 +20,7 @@ from flask_ml.flask_ml_server.models import (
     InputSchema,
     InputType,
     IntParameterDescriptor,
+    NewFileInputType,
     ParameterSchema,
     ParameterType,
     RangedFloatParameterDescriptor,
@@ -39,9 +40,9 @@ from flask_ml.flask_ml_server.models import (
 )
 
 
-def get_input_argument_validator_func(input_type: InputType):
+def get_input_argument_validator_func(input_type: Union[InputType, NewFileInputType]):
     match input_type:
-        case InputType.FILE | InputType.DIRECTORY | InputType.BATCHFILE | InputType.BATCHDIRECTORY:
+        case InputType.FILE | InputType.DIRECTORY | InputType.BATCHFILE | InputType.BATCHDIRECTORY | NewFileInputType():
             return is_pathname_valid_arg_parser
         case InputType.TEXT | InputType.BATCHTEXT | InputType.TEXTAREA:
             return str
@@ -127,7 +128,7 @@ class MLCli:
             for input_schema in task_schema.inputs:
                 cli_input = getattr(args, input_schema.key)
                 match input_schema.input_type:
-                    case InputType.FILE:
+                    case InputType.FILE | NewFileInputType():
                         input_model = FileInput(path=cli_input)
                     case InputType.DIRECTORY:
                         input_model = DirectoryInput(path=cli_input)

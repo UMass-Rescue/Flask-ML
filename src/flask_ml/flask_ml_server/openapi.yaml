@@ -234,11 +234,38 @@ components:
           nullable: true
           default: ''
         inputType:
-          $ref: "#/components/schemas/InputType"
-    
+          oneOf:
+            - $ref: "#/components/schemas/InputType"
+            - $ref: "#/components/schemas/NewFileInputType"
+
     InputType:
       type: string
       enum: ["file", "directory", "text", "textarea", "batchfile", "batchtext", "batchdirectory"]
+
+    NewFileInputType:
+      type: object
+      required: [inputType, defaultExtension, allowedExtensions]
+      properties:
+        defaultName:
+          type: string
+          example: "my_file"
+        defaultExtension:
+          type: string
+          example: ".db"
+        allowedExtensions:
+          oneOf:
+            - type: string
+              enum:
+                - "*"
+              default: "*"
+            - type: array
+              items:
+                type: string
+              example: [".db", ".sqlite", ".txt", ".csv"]
+        inputType:
+          type: string
+          enum: ["newfile"]
+          default: "newfile"
 
     ParameterSchema:
       type: object

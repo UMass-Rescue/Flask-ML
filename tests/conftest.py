@@ -140,7 +140,13 @@ def server():
         return ResponseBody(root=process_texts(inputs["text_inputs"].texts, parameters))
 
     @server.route("/process_file_with_schema", get_task_schema(FILE_INPUT_SCHEMA, FLOAT_PARAM_SCHEMA))
-    def server_process_image_with_schema(
+    def server_process_file_with_schema(
+        inputs: SingleFileInput, parameters: FloatParameters
+    ) -> ResponseBody:
+        return ResponseBody(root=process_file(inputs["file_input"], parameters))
+    
+    @server.route("/process_newfile_with_schema", get_task_schema(NEWFILEINPUT_INPUT_SCHEMA, FLOAT_PARAM_SCHEMA))
+    def server_process_newfile_with_schema(
         inputs: SingleFileInput, parameters: FloatParameters
     ) -> ResponseBody:
         return ResponseBody(root=process_file(inputs["file_input"], parameters))
@@ -148,7 +154,7 @@ def server():
     @server.route(
         "/process_files_with_schema", get_task_schema(BATCHFILE_INPUT_SCHEMA, RANGED_FLOAT_PARAM_SCHEMA)
     )
-    def server_process_images_with_schema(inputs: FileInputs, parameters: FloatParameters) -> ResponseBody:
+    def server_process_files_with_schema(inputs: FileInputs, parameters: FloatParameters) -> ResponseBody:
         return ResponseBody(root=process_files(inputs["file_inputs"].files, parameters))
 
     @server.route(

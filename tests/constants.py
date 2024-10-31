@@ -13,6 +13,11 @@ DIRECTORY_INPUT_SCHEMA = InputSchema(key="dir_input", label="Directory Input", i
 BATCHDIRECTORY_INPUT_SCHEMA = InputSchema(
     key="dir_inputs", label="Batch Directory Inputs", input_type=InputType.BATCHDIRECTORY
 )
+NEWFILEINPUT_INPUT_SCHEMA = InputSchema(
+    key="file_input",
+    label="New File Input",
+    input_type=NewFileInputType(allowed_extensions="*", default_extension=".test"),
+)
 
 TEXT_PARAM_SCHEMA = ParameterSchema(
     key="param1",
