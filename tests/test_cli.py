@@ -39,6 +39,7 @@ def test_arg_parser_has_all_subcommands(ml_cli: MLCli):
         "process_text_with_schema",
         "process_files_with_schema",
         "process_file_with_schema",
+        "process_newfile_with_schema",
         "process_directory_and_enum_parameter_with_schema",
         "process_directories_and_ranged_int_parameter_with_schema",
         "process_text_input_with_text_area_schema"
@@ -214,6 +215,34 @@ def test_process_file_with_schema_no_input_provided(ml_cli: MLCli):
             ["process_file_with_schema"]
         )
         ml_cli._run_cli_and_return(parsed_args)
+
+# New File
+
+def test_process_newfile_with_schema(ml_cli: MLCli):
+    parsed_args = ml_cli._parse_args(
+        ["process_newfile_with_schema", "--file_input", "file_path.txt", "--param1", "0.5"]
+    )
+    assert parsed_args.file_input == "file_path.txt"
+    assert parsed_args.param1 == 0.5
+    assert parsed_args.func is not None
+
+    response = ml_cli._run_cli_and_return(parsed_args)
+    assert response is not None
+    assert response.model_dump(mode="json") == {
+        "output_type": "file",
+        "file_type": "img",
+        "path": "processed_image.img",
+        "title": "file_path.txt",
+        "subtitle": None,
+    }
+
+def test_process_newfile_with_schema_no_input_provided(ml_cli: MLCli):
+    with pytest.raises(SystemExit):
+        parsed_args = ml_cli._parse_args(
+            ["process_newfile_with_schema"]
+        )
+        ml_cli._run_cli_and_return(parsed_args)
+
 
 # Directory
 

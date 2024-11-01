@@ -72,6 +72,14 @@ def test_list_routes(app):
         },
         {
             "order": 0,
+            "payload_schema": "/process_newfile_with_schema/payload_schema",
+            "run_task": "/process_newfile_with_schema",
+            "sample_payload": "/process_newfile_with_schema/sample_payload",
+            "short_title": "",
+            "task_schema": "/process_newfile_with_schema/task_schema",
+        },
+        {
+            "order": 0,
             "payload_schema": "/process_files_with_schema/payload_schema",
             "run_task": "/process_files_with_schema",
             "sample_payload": "/process_files_with_schema/sample_payload",
