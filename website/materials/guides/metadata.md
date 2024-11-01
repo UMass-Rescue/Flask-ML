@@ -16,7 +16,7 @@ from flask_ml.flask_ml import MLServer, load_file_as_string
 server = MLServer(__name__)
 
 server.add_app_metadata(
-    name="Simple Server - Transform Case",
+    name="Transform Case",
     author="Flask-ML Team",
     version="0.1.0",
     info=load_file_as_string("simple_server_info.md"),
