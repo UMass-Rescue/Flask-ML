@@ -437,3 +437,13 @@ if __name__ == "__main__":
     server.run()
 
 ```
+
+# Additional Features
+
+## Adding a automatically generated CLI
+
+Flask-ML can automatically generate a CLI for your machine learning code. See [Writing a CLI](./cli) for more information.
+
+## Adding Application Metadata
+
+You can provide metadata about your application for use by [Rescue-Box Desktop](https://github.com/UMass-Rescue/RescueBox-Desktop). See [Adding Application Metadata](./metadata) for more information.

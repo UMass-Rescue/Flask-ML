@@ -71,7 +71,7 @@ def process_directories(inputs: List[DirectoryInput], parameters):
     return results
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(autouse=True)
 def server():
     server = MLServer(__name__)
 
@@ -193,6 +193,6 @@ def server():
     return server
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(autouse=True)
 def app(server: MLServer):
     return server.app.test_client()

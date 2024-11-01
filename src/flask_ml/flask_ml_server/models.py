@@ -4,21 +4,20 @@
 
 from __future__ import annotations
 
-from datetime import datetime
 from enum import Enum
 from typing import Annotated, Any, Dict, List, Literal, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field, RootModel
 
 
-class InfoPage(BaseModel):
+class AppMetadata(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,
     )
     info: Annotated[str, Field(description='Markdown content to render on the info page')]
     author: str
     version: str
-    last_updated: Annotated[datetime, Field(alias='lastUpdated')]
+    name: Annotated[str, Field(examples=['Face Match App'])]
 
 
 class SchemaAPIRoute(BaseModel):
