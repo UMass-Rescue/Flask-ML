@@ -25,8 +25,7 @@ classifiers = [
 dependencies = [
     "Flask",
     "requests",
-    "pydantic",
-    "datamodel-code-generator"
+    "pydantic"
 ]
 
 [project.optional-dependencies]
@@ -38,7 +37,8 @@ dev = [
     "types-requests",
     "pytest",
     "pytest-cov",
-    "autoflake8"
+    "autoflake8",
+    "datamodel-code-generator"
 ]
 
 [project.urls]
