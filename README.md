@@ -18,6 +18,10 @@ pip install flask-ml
 
 Refer simple_server.py, more_server_examples.py, and simple_cli.py
 
+```
+python3 -m simple_server
+```
+
 #### Client
 
 Refer client_example.py
@@ -33,3 +37,6 @@ To re-generate the model classes, run
 ```
 make generate-models
 ```
+
+See this PR for a full-walkthrough of how to contribute to Flask-ML.
+https://github.com/UMass-Rescue/Flask-ML/pull/45
