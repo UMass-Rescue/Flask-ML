@@ -42,6 +42,7 @@ def test_arg_parser_has_all_subcommands(ml_cli: MLCli):
         "process_newfile_with_schema",
         "process_directory_and_enum_parameter_with_schema",
         "process_directories_and_ranged_int_parameter_with_schema",
+        "process_directories_and_boolean_parameter_with_schema",
         "process_text_input_with_text_area_schema"
     }
 
