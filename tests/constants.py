@@ -61,3 +61,8 @@ RANGED_INT_PARAM_SCHEMA = ParameterSchema(
         range=IntRangeDescriptor(min=0, max=10),
     ),
 )
+BOOL_PARAM_SCHEMA = ParameterSchema(
+    key="param1",
+    label="Boolean Parameter",
+    value=BoolParameterDescriptor(parameter_type=ParameterType.BOOLEAN, default=False),
+)

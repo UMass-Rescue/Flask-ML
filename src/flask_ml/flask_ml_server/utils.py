@@ -10,6 +10,7 @@ from flask_ml.flask_ml_server.models import (
     BatchDirectoryInput,
     BatchFileInput,
     BatchTextInput,
+    BoolParameterDescriptor,
     DirectoryInput,
     EnumParameterDescriptor,
     FileInput,
@@ -97,7 +98,6 @@ def schema_get_sample_payload(schema: TaskSchema) -> RequestBody:
     parameter_schema = schema.parameters
 
     inputs: Dict[str, Input] = {}
-    parameters = {}
     for input_schema in input_schema:
         input_type = input_schema.input_type
         match input_type:
@@ -144,6 +144,8 @@ def schema_get_sample_payload(schema: TaskSchema) -> RequestBody:
                 )
             case _:  # pragma: no cover
                 assert_never(input_type)
+    
+    parameters = {}
     for parameter_schema in parameter_schema:
         match parameter_schema.value:
             case RangedFloatParameterDescriptor():
@@ -157,6 +159,8 @@ def schema_get_sample_payload(schema: TaskSchema) -> RequestBody:
             case RangedIntParameterDescriptor():
                 parameters[parameter_schema.key] = parameter_schema.value.range.min
             case IntParameterDescriptor():
+                parameters[parameter_schema.key] = parameter_schema.value.default
+            case BoolParameterDescriptor():
                 parameters[parameter_schema.key] = parameter_schema.value.default
             case _:  # pragma: no cover
                 assert_never(parameter_schema.value)
@@ -303,6 +307,10 @@ def ensure_ml_func_hinting_and_task_schemas_are_valid(
                 assert (
                     parameter_type_hint is int
                 ), f"For key {key}, the parameter type is ParameterType.INT, but the TypeDict hint is {parameter_type_hint}. Change to int."
+            case ParameterType.BOOLEAN:
+                assert (
+                    parameter_type_hint is bool
+                ), f"For key {key}, the parameter type is ParameterType.BOOLEAN, but the TypeDict hint is {parameter_type_hint}. Change to bool."
             case _:  # pragma: no cover
                 assert_never(parameter_type)
 

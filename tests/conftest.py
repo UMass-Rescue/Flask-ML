@@ -104,6 +104,9 @@ def server():
 
     class EnumParameters(TypedDict):
         param1: str
+    
+    class BoolParameters(TypedDict):
+        param1: bool
 
     @server.route("/process_text")
     def server_process_text(inputs: SingleTextInput, parameters: TextParameters) -> ResponseBody:
@@ -178,6 +181,15 @@ def server():
     )
     def server_process_directories_and_ranged_int_parameter_with_schema(
         inputs: DirectoryInputs, parameters: IntParameters
+    ) -> ResponseBody:
+        return ResponseBody(root=process_directories(inputs["dir_inputs"].directories, parameters))
+    
+    @server.route(
+        "/process_directories_and_boolean_parameter_with_schema",
+        get_task_schema(BATCHDIRECTORY_INPUT_SCHEMA, BOOL_PARAM_SCHEMA),
+    )
+    def server_process_directories_and_boolean_parameter_with_schema(
+        inputs: DirectoryInputs, parameters: BoolParameters
     ) -> ResponseBody:
         return ResponseBody(root=process_directories(inputs["dir_inputs"].directories, parameters))
     

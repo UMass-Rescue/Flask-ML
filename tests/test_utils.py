@@ -213,6 +213,7 @@ def test_schema_get_sample_payload_on_valid_input(input_schema, expected_inputs)
         (INT_PARAM_SCHEMA, {"param1": 1}),
         (RANGED_FLOAT_PARAM_SCHEMA, {"param1": 0.0}),
         (RANGED_INT_PARAM_SCHEMA, {"param1": 0}),
+        (BOOL_PARAM_SCHEMA, {"param1": False}),
     ],
 )
 def test_schema_get_sample_payload_on_valid_parameters(parameter_schema, expected_parameters):

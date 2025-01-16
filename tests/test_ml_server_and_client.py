@@ -112,6 +112,14 @@ def test_list_routes(app):
         },
         {
             "order": 0,
+            "payload_schema": "/process_directories_and_boolean_parameter_with_schema/payload_schema",
+            "run_task": "/process_directories_and_boolean_parameter_with_schema",
+            "sample_payload": "/process_directories_and_boolean_parameter_with_schema/sample_payload",
+            "short_title": "",
+            "task_schema": "/process_directories_and_boolean_parameter_with_schema/task_schema",
+        },
+        {
+            "order": 0,
             "payload_schema": "/process_text_input_with_text_area_schema/payload_schema",
             "run_task": "/process_text_input_with_text_area_schema",
             "sample_payload": "/process_text_input_with_text_area_schema/sample_payload",

@@ -300,6 +300,8 @@ Next, we will write a similar schema for our parameters by building an `Paramete
 - `RangedFloatParameterDescriptor`
     - `default`: default value
     - `range`: a `FloatRangeDescriptor` containing a `min` value and `max` value
+- `BoolParameterDescriptor`
+    - `default`: default value (True or False)
 
 Let's write a parameter schema for our function's parameters:
 
