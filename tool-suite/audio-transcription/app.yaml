@@ -1,0 +1,10 @@
+Name: Audio Transcription
+Slug: audio-transcription
+Description: A tool to transcribe a given audio file. It wraps Whisper's audio description code.
+Usage:
+  - python -m tool-suite.audio-transcription.cli transcribe --audio_files <path to file>
+Example:
+  - python -m tool-suite.audio-transcription.cli transcribe --audio_files tool-suite/audio-transcription/audio_files/news.mp3
+Creators:
+  - Prasanna LS
+  - Brian Levine
