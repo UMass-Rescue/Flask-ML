@@ -1,10 +1,10 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
-const lightCodeTheme = require("prism-react-renderer/themes/github")
-const darkCodeTheme = require("prism-react-renderer/themes/dracula")
-const math = require("remark-math")
-const katex = require("rehype-katex")
+const lightCodeTheme = require('prism-react-renderer').themes.github;
+const darkCodeTheme = require('prism-react-renderer').themes.dracula;
+import math from "remark-math";
+import katex from "rehype-katex";
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
