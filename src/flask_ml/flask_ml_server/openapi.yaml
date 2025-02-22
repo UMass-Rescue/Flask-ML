@@ -231,10 +231,11 @@ components:
             - $ref: '#/components/schemas/TextParameterDescriptor'
             - $ref: '#/components/schemas/RangedIntParameterDescriptor'
             - $ref: '#/components/schemas/IntParameterDescriptor'
+            - $ref: '#/components/schemas/BoolParameterDescriptor'
 
     ParameterType:
       type: string
-      enum: ["ranged_float", "float", "enum", "text", "ranged_int", "int"]
+      enum: ["ranged_float", "float", "enum", "text", "ranged_int", "int", "boolean"]
 
     RangedFloatParameterDescriptor:
       type: object
@@ -348,6 +349,19 @@ components:
           type: number
         max:
           type: number
+    
+    BoolParameterDescriptor:
+      type: object
+      required: [parameterType, default]
+      discriminator:
+        propertyName: parameterType
+      properties:
+        parameterType:
+          type: string
+          $ref: "#/components/schemas/ParameterType"
+          default: "boolean"
+        default:
+          type: boolean
 
     # Request Models
     RequestBody:

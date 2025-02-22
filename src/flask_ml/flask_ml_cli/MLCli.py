@@ -14,6 +14,7 @@ from flask_ml.flask_ml_server.models import (
     BatchDirectoryInput,
     BatchFileInput,
     BatchTextInput,
+    BoolParameterDescriptor,
     DirectoryInput,
     FileInput,
     FloatParameterDescriptor,
@@ -64,6 +65,8 @@ def get_parameter_argument_validator_func(parameter_schema: ParameterSchema):
             return get_int_range_check_func_arg_parser(parameter_schema.value.range)
         case IntParameterDescriptor():
             return int
+        case BoolParameterDescriptor():
+            return bool
         case _:  # pragma: no cover
             assert_never(parameter_schema.value)
 
