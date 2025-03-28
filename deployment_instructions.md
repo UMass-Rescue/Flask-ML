@@ -65,7 +65,7 @@ In our example, we will use [gunicorn](https://gunicorn.org/). To install gunico
 pip install gunicorn
 ```
 
-Even with gunicorn, we need to specify which variable in our file contains the Flask application instance. Firtly, we need to make the same changes to the code as we did for "flask run" command - 
+Even with gunicorn, we need to specify which variable in our file contains the Flask application instance. Firstly, we need to make the same changes to the code as we did for "flask run" command - 
 
 ```
 # begin server instance

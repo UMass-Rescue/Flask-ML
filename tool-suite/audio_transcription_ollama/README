@@ -1,0 +1,10 @@
+We used a dataset of around 3,400 YouTube videos related to travel, art/music, etc. from Kaggle.
+
+We retrieved the audio transcripts (as text) from these videos, transformed them into paragraphs with punctuation, and asked ollama to read the paragraphs and add to the dataset the number of people in the video, as well as a list of segments about a certain keyword (in this proof of concept, "car"). 
+
+Future developments: 
+- Use more full test data (for sake of time, this was only tested on a couple transcripts for just the beginning 10 phrases of the transcript)
+- Add more features to ask ollama about the transcript
+- Use unsupervised learning to cluster the transcripts based on these traits, and predict the cluster label for future transcripts
+
+In the future, this could be developed further to enable users to find important details about videos and specific locations related to topics of interest to look further into. This could eventually assist investigators in looking in a set of videos for evidence of commercial sexual exploitation of children, and finding video segments to investigate even more closely.
